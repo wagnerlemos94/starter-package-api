@@ -1,6 +1,6 @@
 package br.com.digidatasistemas.starterPackage.service.implement;
 
-import br.com.digidatasistemas.starterPackage.model.User;
+import br.com.digidatasistemas.starterPackage.model.Usuario;
 import br.com.digidatasistemas.starterPackage.service.IJwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -27,10 +27,10 @@ public class JwtService implements IJwtService {
         );
     }
 
-    public String generateToken(User user) {
+    public String generateToken(Usuario usuario) {
 
         return Jwts.builder()
-                .subject(user.getCpf())
+                .subject(usuario.getCpf())
                 .issuedAt(new Date())
                 .expiration(
                         Date.from(

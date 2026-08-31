@@ -3,8 +3,8 @@ package br.com.digidatasistemas.starterPackage.service.implement;
 import br.com.digidatasistemas.starterPackage.controller.dto.request.LoginRequest;
 import br.com.digidatasistemas.starterPackage.controller.dto.response.LoginResponse;
 import br.com.digidatasistemas.starterPackage.exception.UnauthorizedException;
-import br.com.digidatasistemas.starterPackage.model.User;
-import br.com.digidatasistemas.starterPackage.repository.UserRepository;
+import br.com.digidatasistemas.starterPackage.model.Usuario;
+import br.com.digidatasistemas.starterPackage.repository.UsuarioRepository;
 import br.com.digidatasistemas.starterPackage.service.IAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,7 +21,7 @@ import java.util.*;
 public class AuthService implements IAuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final UserRepository repository;
+    private final UsuarioRepository repository;
     private final JwtService jwtService;
 
     public LoginResponse login(LoginRequest request) {
@@ -39,17 +39,17 @@ public class AuthService implements IAuthService {
             throw new UnauthorizedException("Usuário ou senha inválidos");
         }
 
-        User user = (User) authentication.getPrincipal();
+        Usuario usuario = (Usuario) authentication.getPrincipal();
 
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateToken(usuario);
 
         Map<String, List<String>> resources = new HashMap<>();
 
-        user.getProfile().getProfileResources().forEach(profileResource -> {
-            String name = profileResource.getResource().getKey();
+        usuario.getPerfil().getPerfilRecursos().forEach(profileResource -> {
+            String name = profileResource.getRecurso().getChave();
             List<String> permissions = new ArrayList<>();
-            profileResource.getPermissions().forEach(permission -> {
-               permissions.add(permission.getKey());
+            profileResource.getPermissoes().forEach(permission -> {
+               permissions.add(permission.getChave());
             });
             resources.put(name, permissions);
         });
@@ -57,8 +57,8 @@ public class AuthService implements IAuthService {
         return new LoginResponse(
                 token,
                 "",
-                user.getName(),
-                user.getCpf(),
+                usuario.getName(),
+                usuario.getCpf(),
                 resources
         );
     }

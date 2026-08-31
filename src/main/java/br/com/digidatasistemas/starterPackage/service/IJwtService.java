@@ -1,9 +1,9 @@
 package br.com.digidatasistemas.starterPackage.service;
 
-import br.com.digidatasistemas.starterPackage.model.User;
+import br.com.digidatasistemas.starterPackage.model.Usuario;
 
 public interface IJwtService {
 
-    String generateToken(User user);
+    String generateToken(Usuario usuario);
     String extractUsername(String token);
 }

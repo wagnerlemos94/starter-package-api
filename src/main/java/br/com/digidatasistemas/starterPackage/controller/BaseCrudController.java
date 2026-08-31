@@ -4,7 +4,7 @@ import br.com.digidata.crud.controller.CrudController;
 import br.com.digidata.crud.controller.dto.request.IRequest;
 import br.com.digidata.crud.controller.dto.response.IResponse;
 import br.com.digidata.crud.service.ICrudService;
-import br.com.digidatasistemas.starterPackage.security.permission.ResourcePermission;
+import br.com.digidatasistemas.starterPackage.security.permissao.RecursoPermissao;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -71,12 +71,12 @@ public abstract class BaseCrudController<
     protected void checkCrudPermission(
             String permission) {
 
-        ResourcePermission resourcePermission =
+        RecursoPermissao recursoPermissao =
                 getClass().getAnnotation(
-                        ResourcePermission.class
+                        RecursoPermissao.class
                 );
 
-        if (resourcePermission == null) {
+        if (recursoPermissao == null) {
 
             throw new IllegalStateException(
                     "O controller "
@@ -86,7 +86,7 @@ public abstract class BaseCrudController<
         }
 
         String resource =
-                resourcePermission.value();
+                recursoPermissao.value();
 
         String requiredAuthority =
                 resource + ":" + permission;

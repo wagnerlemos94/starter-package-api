@@ -1,7 +1,7 @@
 package br.com.digidatasistemas.starterPackage.security;
 
 import br.com.digidatasistemas.starterPackage.configuration.UsuarioLogado;
-import br.com.digidatasistemas.starterPackage.model.User;
+import br.com.digidatasistemas.starterPackage.model.Usuario;
 import br.com.digidatasistemas.starterPackage.service.implement.CustomUserDetailsService;
 import br.com.digidatasistemas.starterPackage.service.implement.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -54,22 +54,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (email != null &&
                     SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                User user =
+                Usuario usuario =
                         userDetailsService.loadUserByUsername(email);
 
-                usuarioLogado.setIdUsuario(user.getId());
+                usuarioLogado.setIdUsuario(usuario.getId());
                 usuarioLogado.setToken(token);
-                usuarioLogado.setName(user.getName());
-                usuarioLogado.setUserName(user.getUsername());
-                usuarioLogado.setPerfil(user.getProfile().getKey());
+                usuarioLogado.setName(usuario.getName());
+                usuarioLogado.setUserName(usuario.getUsername());
+                usuarioLogado.setPerfil(usuario.getPerfil().getChave());
 
-                if (jwtService.isTokenValid(token, user)) {
+                if (jwtService.isTokenValid(token, usuario)) {
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                    user,
+                                    usuario,
                                     null,
-                                    user.getAuthorities());
+                                    usuario.getAuthorities());
 
                     SecurityContextHolder.getContext()
                             .setAuthentication(authentication);
