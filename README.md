@@ -319,9 +319,26 @@ docker run --rm -p 8085:8085 \
   starter-package-api
 ```
 
-## Health check e OpenAPI
+## Swagger e OpenAPI
 
-A segurança libera `/actuator/health`, `/swagger-ui/**` e `/v3/api-docs/**`. Porém, o `pom.xml` atual não inclui Spring Boot Actuator nem Springdoc OpenAPI; esses endpoints só estarão disponíveis depois que as dependências correspondentes forem adicionadas.
+Com a aplicação em execução, a documentação interativa fica disponível em:
+
+- Swagger UI: http://localhost:8085/api/swagger-ui.html
+- OpenAPI JSON: http://localhost:8085/api/v3/api-docs
+- OpenAPI YAML: http://localhost:8085/api/v3/api-docs.yaml
+
+Para testar endpoints protegidos no Swagger UI:
+
+1. Execute `POST /auth/login`.
+2. Copie o valor de `token` da resposta.
+3. Clique em **Authorize**.
+4. Informe apenas o token; o Swagger adiciona o prefixo `Bearer` automaticamente.
+
+O login e os arquivos da documentação são públicos. Os endpoints CRUD continuam protegidos pelo JWT e pelas permissões da aplicação.
+
+### Health check
+
+A segurança libera `/actuator/health`, mas o `pom.xml` ainda não inclui Spring Boot Actuator. O health check só estará disponível depois que essa dependência for adicionada.
 
 ## Observações para produção
 

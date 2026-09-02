@@ -7,12 +7,14 @@ import br.com.digidatasistemas.starterPackage.controller.dto.response.RecursoRes
 import br.com.digidatasistemas.starterPackage.model.Recurso;
 import br.com.digidatasistemas.starterPackage.security.permissao.RecursoPermissao;
 import br.com.digidatasistemas.starterPackage.service.IRecursoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("resource")
 @RecursoPermissao("RECURSO")
+@Tag(name = "Recursos", description = "Gerenciamento de recursos protegidos")
 public class RecursoController
         extends BaseCrudController<RecursoRequest, RecursoResponse, Recurso> {
 

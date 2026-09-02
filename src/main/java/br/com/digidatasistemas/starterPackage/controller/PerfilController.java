@@ -7,12 +7,14 @@ import br.com.digidatasistemas.starterPackage.controller.dto.response.PerfilResp
 import br.com.digidatasistemas.starterPackage.model.Perfil;
 import br.com.digidatasistemas.starterPackage.security.permissao.RecursoPermissao;
 import br.com.digidatasistemas.starterPackage.service.IPerfilService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("profile")
 @RecursoPermissao("PERFIL")
+@Tag(name = "Perfis", description = "Gerenciamento de perfis e suas permissões")
 public class PerfilController extends BaseCrudController<PerfilRequest, PerfilResponse, Perfil> {
 
     private IPerfilService<Perfil> service;

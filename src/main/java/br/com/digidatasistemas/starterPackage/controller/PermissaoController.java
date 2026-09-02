@@ -7,12 +7,14 @@ import br.com.digidatasistemas.starterPackage.controller.dto.response.PermissaoR
 import br.com.digidatasistemas.starterPackage.model.Permissao;
 import br.com.digidatasistemas.starterPackage.security.permissao.RecursoPermissao;
 import br.com.digidatasistemas.starterPackage.service.IPermissaoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("permission")
 @RecursoPermissao("PERMISSOES")
+@Tag(name = "Permissões", description = "Gerenciamento das operações permitidas")
 public class PermissaoController
         extends BaseCrudController<PermissaoRequest, PermissaoResponse, Permissao> {
 

@@ -7,12 +7,14 @@ import br.com.digidatasistemas.starterPackage.security.permissao.RecursoPermissa
 import br.com.digidatasistemas.starterPackage.controller.dto.request.UsuarioRequest;
 import br.com.digidatasistemas.starterPackage.controller.dto.response.UsuarioResponse;
 import br.com.digidatasistemas.starterPackage.service.IUsuarioService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/user")
 @RecursoPermissao("USUARIO")
+@Tag(name = "Usuários", description = "Gerenciamento de usuários")
 public class UsuarioController extends BaseCrudController<UsuarioRequest, UsuarioResponse, Usuario>{
 
     public UsuarioController(IUsuarioService<Usuario> service, IRequest<UsuarioRequest, Usuario> request, IResponse<Usuario, UsuarioResponse> response) {
