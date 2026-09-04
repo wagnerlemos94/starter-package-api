@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Service
 public interface IUsuarioService<T> extends ICrudService<T, UUID> {
 
     boolean hasPermission(String username, String resource, String permission);

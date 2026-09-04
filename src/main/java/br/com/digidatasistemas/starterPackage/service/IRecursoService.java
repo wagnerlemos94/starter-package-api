@@ -5,6 +5,5 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Service
 public interface IRecursoService<T> extends ICrudService<T, UUID> {
 }

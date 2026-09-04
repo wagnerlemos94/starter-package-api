@@ -5,6 +5,5 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Service
 public interface IPerfilService<T> extends ICrudService<T, UUID> {
 }
