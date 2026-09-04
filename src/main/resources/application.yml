@@ -5,6 +5,8 @@ server:
 
 
 spring:
+  profiles:
+    default: ${SPRING_PROFILES_ACTIVE}
   application:
     name: starter-package
   datasource:

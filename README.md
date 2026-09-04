@@ -301,6 +301,61 @@ NEXT_PUBLIC_BASE_URL=http://localhost:8085/api
 
 O app armazena o JWT como `accessToken` no `localStorage` e o envia como Bearer token. O login converte o campo de formulário `senha` para `password`, como esperado pela API.
 
+## Regras de arquitetura
+
+O projeto usa ArchUnit para verificar automaticamente a separação entre controllers e services. As regras estão em `src/test/java/br/com/digidatasistemas/starterPackage/ArchitectureTest.java` e são executadas junto com os demais testes.
+
+As seguintes regras são obrigatórias:
+
+- Toda classe dentro de `service.implement` deve implementar pelo menos uma interface, própria do projeto ou fornecida por uma biblioteca.
+- Controllers não podem depender diretamente de classes localizadas em `service.implement`; a injeção deve usar uma interface.
+
+Além do teste, o perfil `dev` executa `ArchitectureStartupValidator` automaticamente durante a inicialização do Spring. O validador examina todas as classes nos pacotes de controller e implementação de service, mesmo que elas ainda não tenham uma anotação do Spring. Se alguma regra for violada, a aplicação encerra antes de ficar disponível, inclusive quando for iniciada diretamente pelo botão **Run** da IDE.
+
+O perfil padrão da aplicação é `dev`. Em produção, defina explicitamente:
+
+```env
+SPRING_PROFILES_ACTIVE=prod
+```
+
+O validador de inicialização não é ativado no perfil `prod`; as mesmas regras continuam protegidas pelos testes do ArchUnit durante o build.
+
+Exemplo permitido:
+
+```java
+public UsuarioController(IUsuarioService<Usuario> service) {
+    this.service = service;
+}
+```
+
+Exemplo bloqueado pelo ArchUnit:
+
+```java
+public UsuarioController(UsuarioService service) {
+    this.service = service;
+}
+```
+
+Execute apenas as verificações arquiteturais no PowerShell:
+
+```powershell
+.\mvnw.cmd -Dtest=ArchitectureTest test --settings settings.xml
+```
+
+No Git Bash ou Linux:
+
+```bash
+./mvnw -Dtest=ArchitectureTest test --settings settings.xml
+```
+
+Para executar todos os testes:
+
+```powershell
+.\mvnw.cmd test --settings settings.xml
+```
+
+O Maven precisa das variáveis `GITHUB_USERNAME` e `GITHUB_TOKEN` para baixar a dependência privada `crud-core` do GitHub Packages. Sem credenciais válidas, a compilação termina com `401 Unauthorized` antes de executar o ArchUnit.
+
 ## Docker
 
 ```bash
