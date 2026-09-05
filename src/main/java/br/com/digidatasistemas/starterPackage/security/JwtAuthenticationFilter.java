@@ -1,6 +1,5 @@
 package br.com.digidatasistemas.starterPackage.security;
 
-import br.com.digidatasistemas.starterPackage.configuration.UsuarioLogado;
 import br.com.digidatasistemas.starterPackage.model.Usuario;
 import br.com.digidatasistemas.starterPackage.service.implement.CustomUserDetailsService;
 import br.com.digidatasistemas.starterPackage.service.implement.JwtService;
@@ -29,7 +28,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
-    private final UsuarioLogado usuarioLogado;
 
     @Override
     protected void doFilterInternal(
@@ -56,12 +54,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 Usuario usuario =
                         userDetailsService.loadUserByUsername(email);
-
-                usuarioLogado.setIdUsuario(usuario.getId());
-                usuarioLogado.setToken(token);
-                usuarioLogado.setName(usuario.getName());
-                usuarioLogado.setUserName(usuario.getUsername());
-                usuarioLogado.setPerfil(usuario.getPerfil().getChave());
 
                 if (jwtService.isTokenValid(token, usuario)) {
 

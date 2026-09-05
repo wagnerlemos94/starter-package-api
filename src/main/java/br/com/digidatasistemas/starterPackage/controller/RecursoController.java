@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("resource")
+@RequestMapping("recurso")
 @RecursoPermissao("RECURSO")
 @Tag(name = "Recursos", description = "Gerenciamento de recursos protegidos")
 public class RecursoController

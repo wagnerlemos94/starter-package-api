@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("permission")
+@RequestMapping("permissao")
 @RecursoPermissao("PERMISSOES")
 @Tag(name = "Permissões", description = "Gerenciamento das operações permitidas")
 public class PermissaoController

@@ -4,8 +4,12 @@ import br.com.digidata.crud.service.CrudService;
 import br.com.digidatasistemas.starterPackage.exception.BusinessException;
 import br.com.digidatasistemas.starterPackage.model.Perfil;
 import br.com.digidatasistemas.starterPackage.model.PerfilRecurso;
+import br.com.digidatasistemas.starterPackage.model.Usuario;
 import br.com.digidatasistemas.starterPackage.repository.PerfilRepository;
+import br.com.digidatasistemas.starterPackage.security.UsuarioAutenticado;
 import br.com.digidatasistemas.starterPackage.service.IPerfilService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,11 +24,13 @@ import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_R
 @Service
 public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilService<Perfil> {
 
-    private PerfilRepository repository;
+    private final PerfilRepository repository;
+    private final UsuarioAutenticado usuarioAutenticado;
 
-    public PerfilService(PerfilRepository repository) {
+    public PerfilService(PerfilRepository repository, UsuarioAutenticado usuarioAutenticado) {
         super(repository);
         this.repository = repository;
+        this.usuarioAutenticado = usuarioAutenticado;
     }
 
     @Override
@@ -98,4 +104,9 @@ public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilS
         return this.repository.save(perfilSave);
     }
 
+
+    @Override
+    public boolean existsById(UUID id) {
+        return repository.existsById(id);
+    }
 }

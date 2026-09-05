@@ -2,7 +2,6 @@ package br.com.digidatasistemas.starterPackage.controller.dto.response;
 
 import br.com.digidata.crud.controller.dto.response.IResponse;
 import br.com.digidatasistemas.starterPackage.model.Usuario;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
@@ -19,8 +18,6 @@ public class UsuarioResponse implements IResponse<Usuario, UsuarioResponse> {
 
     private UUID id;
     private String cpf;
-    @JsonIgnore
-    private String password;
     private String name;
     private Boolean active;
     private PerfilResponse profile;
@@ -33,7 +30,6 @@ public class UsuarioResponse implements IResponse<Usuario, UsuarioResponse> {
                 .cpf(usuario.getCpf())
                 .name(usuario.getName())
                 .active(usuario.getActive())
-                .password(usuario.getPassword())
                 .profile(profile)
                 .build();
     }

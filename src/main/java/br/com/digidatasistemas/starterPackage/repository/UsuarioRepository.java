@@ -31,4 +31,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
             @Param("recurso") String recurso,
             @Param("permissao") String permissao
     );
+
+    boolean existsByCpf(String cpf);
+
+    boolean existsByCpfAndIdNot(String cpf, UUID id);
 }

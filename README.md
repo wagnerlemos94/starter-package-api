@@ -121,6 +121,26 @@ curl http://localhost:8085/api/user \
   -H "Authorization: Bearer SEU_TOKEN"
 ```
 
+### Obter o usuário autenticado
+
+Services e outros componentes podem receber `UsuarioAutenticado` por injeção de dependência. O componente não armazena estado; ele consulta o `SecurityContext` da requisição atual.
+
+```java
+@Service
+@RequiredArgsConstructor
+public class PedidoService {
+
+    private final UsuarioAutenticado usuarioAutenticado;
+
+    public void criarPedido() {
+        UUID usuarioId = usuarioAutenticado.getId();
+        Usuario usuario = usuarioAutenticado.get();
+    }
+}
+```
+
+Os métodos disponíveis são `get()`, `getId()` e `getCpf()`. Quando não existir um `Usuario` autenticado, o componente lança `AccessDeniedException`.
+
 ## Contrato CRUD
 
 Os quatro recursos seguem o mesmo conjunto de rotas, fornecido por `crud-core`:

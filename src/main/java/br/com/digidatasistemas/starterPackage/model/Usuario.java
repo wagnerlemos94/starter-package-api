@@ -1,5 +1,6 @@
 package br.com.digidatasistemas.starterPackage.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,6 +31,7 @@ public class Usuario implements UserDetails {
     @Column(nullable = false, unique = true)
     private String cpf;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 

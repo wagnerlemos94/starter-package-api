@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("profile")
+@RequestMapping("perfil")
 @RecursoPermissao("PERFIL")
 @Tag(name = "Perfis", description = "Gerenciamento de perfis e suas permissões")
 public class PerfilController extends BaseCrudController<PerfilRequest, PerfilResponse, Perfil> {
