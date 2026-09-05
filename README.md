@@ -411,6 +411,26 @@ Para testar endpoints protegidos no Swagger UI:
 
 O login e os arquivos da documentação são públicos. Os endpoints CRUD continuam protegidos pelo JWT e pelas permissões da aplicação.
 
+## Contrato de erros
+
+Todos os erros da API, inclusive falhas do filtro JWT, seguem o mesmo formato:
+
+```json
+{
+  "timestamp": "2026-09-05T12:00:00",
+  "status": 400,
+  "error": "BAD_REQUEST",
+  "message": "Dados inválidos",
+  "path": "/api/user",
+  "errorId": "b38c67d3-1ae1-4765-a1e3-401ef177dcea",
+  "errors": [
+    { "field": "cpf", "message": "CPF deve conter exatamente 11 números" }
+  ]
+}
+```
+
+Erros de validação retornam `400`, recursos não encontrados `404`, duplicidades e violações de integridade `409`, falhas de autenticação `401` e autorização `403`. Em erros internos, detalhes técnicos ficam somente no log e podem ser localizados pelo `errorId`.
+
 ### Health check
 
 A segurança libera `/actuator/health`, mas o `pom.xml` ainda não inclui Spring Boot Actuator. O health check só estará disponível depois que essa dependência for adicionada.

@@ -2,6 +2,8 @@ package br.com.digidatasistemas.starterPackage.exception;
 
 import br.com.digidata.crud.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -11,179 +13,126 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
+@Slf4j
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex,
-                                                                              HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleValidation(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
+    ) {
+        List<FieldErrorResponse> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> new FieldErrorResponse(error.getField(), error.getDefaultMessage()))
+                .toList();
 
-        ErrorResponse response =
-                new ErrorResponse(
-                        LocalDateTime.now(),
-                        HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.name(),
-                        ex.getMessage(),
-                        request.getRequestURI(),
-                        Collections.emptyList()
-                );
-
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(response);
+        return response(HttpStatus.BAD_REQUEST, "Dados inválidos", request, errors);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(
             ResourceNotFoundException ex,
             HttpServletRequest request
-    ){
-
-        ErrorResponse response =
-                new ErrorResponse(
-                        LocalDateTime.now(),
-                        HttpStatus.NOT_FOUND.value(),
-                        HttpStatus.NOT_FOUND.name(),
-                        ex.getMessage(),
-                        request.getRequestURI(),
-                        Collections.emptyList()
-                );
-
-
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(response);
+    ) {
+        return response(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
-
-
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusiness(
             BusinessException ex,
             HttpServletRequest request
-    ){
-
-        ErrorResponse response =
-                new ErrorResponse(
-                        LocalDateTime.now(),
-                        HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.name(),
-                        ex.getMessage(),
-                        request.getRequestURI(),
-                        Collections.emptyList()
-                );
-
-
-        return ResponseEntity
-                .badRequest()
-                .body(response);
+    ) {
+        return response(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
+    @ExceptionHandler({ConflictException.class, DataIntegrityViolationException.class})
+    public ResponseEntity<ErrorResponse> handleConflict(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        String message = ex instanceof ConflictException
+                ? ex.getMessage()
+                : "Não foi possível concluir a operação porque o recurso já existe ou está em uso.";
 
-
+        return response(HttpStatus.CONFLICT, message, request);
+    }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorized(
             UnauthorizedException ex,
             HttpServletRequest request
-    ){
-
-
-        ErrorResponse response =
-                new ErrorResponse(
-                        LocalDateTime.now(),
-                        HttpStatus.UNAUTHORIZED.value(),
-                        HttpStatus.UNAUTHORIZED.name(),
-                        ex.getMessage(),
-                        request.getRequestURI(),
-                        Collections.emptyList()
-                );
-
-
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(response);
-
+    ) {
+        return response(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
     }
 
-    @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleDeniedException(
+    @ExceptionHandler({AuthorizationDeniedException.class, AccessDeniedException.class})
+    public ResponseEntity<ErrorResponse> handleForbidden(
             Exception ex,
             HttpServletRequest request
-    ){
-
-
-        ErrorResponse response =
-                new ErrorResponse(
-                        LocalDateTime.now(),
-                        HttpStatus.FORBIDDEN.value(),
-                        HttpStatus.FORBIDDEN.name(),
-                        "Usuário não tem permissão para acessar essa funcinalidade.",
-                        request.getRequestURI(),
-                        Arrays.asList(ex.getMessage())
-                );
-
-
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(response);
-
+    ) {
+        return response(
+                HttpStatus.FORBIDDEN,
+                "Usuário não tem permissão para acessar esta funcionalidade.",
+                request
+        );
     }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
-            Exception ex,
-            HttpServletRequest request
-    ){
-
-
-        ErrorResponse response =
-                new ErrorResponse(
-                        LocalDateTime.now(),
-                        HttpStatus.FORBIDDEN.value(),
-                        HttpStatus.FORBIDDEN.name(),
-                        "Usuário não tem permissão para acessar essa funcinalidade.",
-                        request.getRequestURI(),
-                        Arrays.asList(ex.getMessage())
-                );
-
-
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(response);
-
-    }
-
-
-
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(
             Exception ex,
             HttpServletRequest request
-    ){
+    ) {
+        String errorId = UUID.randomUUID().toString();
+        log.error("Erro interno não tratado. errorId={}", errorId, ex);
 
+        return response(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Erro interno no servidor",
+                request,
+                errorId,
+                List.of()
+        );
+    }
 
-        ErrorResponse response =
-                new ErrorResponse(
-                        LocalDateTime.now(),
-                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        HttpStatus.INTERNAL_SERVER_ERROR.name(),
-                        "Erro interno no servidor",
-                        request.getRequestURI(),
-                        Arrays.asList(ex.getMessage())
-                );
+    private ResponseEntity<ErrorResponse> response(
+            HttpStatus status,
+            String message,
+            HttpServletRequest request
+    ) {
+        return response(status, message, request, List.of());
+    }
 
+    private ResponseEntity<ErrorResponse> response(
+            HttpStatus status,
+            String message,
+            HttpServletRequest request,
+            List<FieldErrorResponse> errors
+    ) {
+        return response(status, message, request, UUID.randomUUID().toString(), errors);
+    }
 
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(response);
+    private ResponseEntity<ErrorResponse> response(
+            HttpStatus status,
+            String message,
+            HttpServletRequest request,
+            String errorId,
+            List<FieldErrorResponse> errors
+    ) {
+        ErrorResponse body = new ErrorResponse(
+                LocalDateTime.now(),
+                status.value(),
+                status.name(),
+                message,
+                request.getRequestURI(),
+                errorId,
+                errors
+        );
 
+        return ResponseEntity.status(status).body(body);
     }
 }
-
-

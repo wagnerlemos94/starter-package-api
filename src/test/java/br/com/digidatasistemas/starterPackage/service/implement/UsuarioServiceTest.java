@@ -2,6 +2,7 @@ package br.com.digidatasistemas.starterPackage.service.implement;
 
 import br.com.digidata.crud.exception.ResourceNotFoundException;
 import br.com.digidatasistemas.starterPackage.exception.BusinessException;
+import br.com.digidatasistemas.starterPackage.exception.ConflictException;
 import br.com.digidatasistemas.starterPackage.model.Perfil;
 import br.com.digidatasistemas.starterPackage.model.Usuario;
 import br.com.digidatasistemas.starterPackage.repository.UsuarioRepository;
@@ -91,7 +92,7 @@ class UsuarioServiceTest {
         Usuario usuario = usuarioNovo(perfil(UUID.randomUUID()));
         when(usuarioRepository.existsByCpf(CPF)).thenReturn(true);
 
-        assertThrows(BusinessException.class, () -> usuarioService.create(usuario));
+        assertThrows(ConflictException.class, () -> usuarioService.create(usuario));
 
         verify(usuarioRepository, never()).save(any());
         verify(passwordEncoder, never()).encode(any());
@@ -161,7 +162,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findById(id)).thenReturn(Optional.of(existente));
         when(usuarioRepository.existsByCpfAndIdNot(CPF, id)).thenReturn(true);
 
-        assertThrows(BusinessException.class, () -> usuarioService.update(id, alteracoes));
+        assertThrows(ConflictException.class, () -> usuarioService.update(id, alteracoes));
 
         verify(usuarioRepository, never()).save(any());
         verify(passwordEncoder, never()).encode(any());

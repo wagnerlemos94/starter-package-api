@@ -1,8 +1,10 @@
 package br.com.digidatasistemas.starterPackage.security;
 
+import br.com.digidatasistemas.starterPackage.exception.ErrorResponse;
 import br.com.digidatasistemas.starterPackage.model.Usuario;
 import br.com.digidatasistemas.starterPackage.service.implement.CustomUserDetailsService;
 import br.com.digidatasistemas.starterPackage.service.implement.JwtService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -21,6 +23,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -28,6 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(
@@ -102,13 +108,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        response.getWriter().write("""
-            {
-                "status":401,
-                "error":"UNAUTHORIZED",
-                "message":"%s",
-                "path":"%s"
-            }
-            """.formatted(message, request.getRequestURI()));
+        ErrorResponse body = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpServletResponse.SC_UNAUTHORIZED,
+                "UNAUTHORIZED",
+                message,
+                request.getRequestURI(),
+                UUID.randomUUID().toString(),
+                List.of()
+        );
+
+        objectMapper.writeValue(response.getWriter(), body);
     }
 }

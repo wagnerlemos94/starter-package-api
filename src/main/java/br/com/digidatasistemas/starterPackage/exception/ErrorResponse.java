@@ -10,6 +10,7 @@ public record ErrorResponse(
         String error,
         String message,
         String path,
-        List<String> details
+        String errorId,
+        List<FieldErrorResponse> errors
 
 ) {}

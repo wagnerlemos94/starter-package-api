@@ -2,6 +2,7 @@ package br.com.digidatasistemas.starterPackage.service.implement;
 
 import br.com.digidata.crud.service.CrudService;
 import br.com.digidatasistemas.starterPackage.exception.BusinessException;
+import br.com.digidatasistemas.starterPackage.exception.ConflictException;
 import br.com.digidatasistemas.starterPackage.model.Perfil;
 import br.com.digidatasistemas.starterPackage.model.Usuario;
 import br.com.digidatasistemas.starterPackage.repository.UsuarioRepository;
@@ -70,7 +71,7 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
         Usuario usuarioUpdate = super.findById(id);
 
         if (existsByCpfAndIdNot(usuario.getCpf(), id)) {
-            throw new BusinessException(
+            throw new ConflictException(
                     "O usuário " + usuario.getCpf() + MSG_USUARIO_JA_EXISTENTE
             );
         }
@@ -113,7 +114,7 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
 
     private void validacaoCriacaoUsuario(Usuario usuario){
         if(existsByCpf(usuario.getCpf())){
-            throw new BusinessException("O usuário " + usuario.getCpf() + MSG_USUARIO_JA_EXISTENTE);
+            throw new ConflictException("O usuário " + usuario.getCpf() + MSG_USUARIO_JA_EXISTENTE);
         }
         if (usuario.getPassword() == null || usuario.getPassword().isBlank()) {
             throw new BusinessException("Senha é obrigatória.");

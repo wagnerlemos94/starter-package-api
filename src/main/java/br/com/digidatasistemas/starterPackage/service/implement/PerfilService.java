@@ -1,7 +1,7 @@
 package br.com.digidatasistemas.starterPackage.service.implement;
 
 import br.com.digidata.crud.service.CrudService;
-import br.com.digidatasistemas.starterPackage.exception.BusinessException;
+import br.com.digidatasistemas.starterPackage.exception.ConflictException;
 import br.com.digidatasistemas.starterPackage.model.Perfil;
 import br.com.digidatasistemas.starterPackage.model.PerfilRecurso;
 import br.com.digidatasistemas.starterPackage.model.Usuario;
@@ -36,7 +36,7 @@ public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilS
     @Override
     public Perfil create(Perfil perfil) {
         if(exitePerfilComEsseNome(perfil.getNome())){
-            throw new BusinessException(MSG_RECURSO_JA_EXITESNTE + " com esse nome: " + perfil.getNome());
+            throw new ConflictException(MSG_RECURSO_JA_EXITESNTE + " com esse nome: " + perfil.getNome());
         }
         perfil.setChave(perfil.getNome().toUpperCase());
         return repository.save(perfil);
