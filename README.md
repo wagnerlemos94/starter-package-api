@@ -197,6 +197,8 @@ Base: `/api/profile`
 
 `perfilRecurso` é um mapa em que a chave é o UUID do recurso e o valor é a lista de UUIDs das permissões concedidas.
 
+Na criação e atualização, a API carrega recursos e permissões pelo banco antes de associá-los ao perfil. IDs inexistentes, recursos ou permissões inativos e valores duplicados são rejeitados. Uma lista ausente é tratada como vazia; na atualização isso remove as associações que não foram enviadas. A chave do perfil é recalculada sempre que seu nome muda.
+
 ```json
 {
   "nome": "GESTOR",

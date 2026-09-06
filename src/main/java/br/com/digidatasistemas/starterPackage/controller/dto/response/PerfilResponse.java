@@ -22,6 +22,7 @@ public class PerfilResponse implements IResponse<Perfil, PerfilResponse> {
     private String chave;
     private String descricao;
     private Boolean ativo;
+    @Builder.Default
     private List<PerfilRecursoResponse> perfilRecursoResponse = new ArrayList<>();
 
     public PerfilResponse(Perfil perfil) {
@@ -30,7 +31,9 @@ public class PerfilResponse implements IResponse<Perfil, PerfilResponse> {
         this.chave = perfil.getChave();
         this.descricao = perfil.getDescricao();
         this.ativo = perfil.getAtivo();
-        this.perfilRecursoResponse = perfil.getPerfilRecursos().stream().map(PerfilRecursoResponse::new).toList();
+        this.perfilRecursoResponse = perfil.getPerfilRecursos() == null
+                ? List.of()
+                : perfil.getPerfilRecursos().stream().map(PerfilRecursoResponse::new).toList();
     }
 
     @Override

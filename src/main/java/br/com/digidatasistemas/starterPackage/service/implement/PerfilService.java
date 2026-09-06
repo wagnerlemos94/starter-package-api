@@ -1,22 +1,26 @@
 package br.com.digidatasistemas.starterPackage.service.implement;
 
 import br.com.digidata.crud.service.CrudService;
+import br.com.digidatasistemas.starterPackage.exception.BusinessException;
 import br.com.digidatasistemas.starterPackage.exception.ConflictException;
 import br.com.digidatasistemas.starterPackage.model.Perfil;
 import br.com.digidatasistemas.starterPackage.model.PerfilRecurso;
-import br.com.digidatasistemas.starterPackage.model.Usuario;
+import br.com.digidatasistemas.starterPackage.model.Permissao;
+import br.com.digidatasistemas.starterPackage.model.Recurso;
 import br.com.digidatasistemas.starterPackage.repository.PerfilRepository;
-import br.com.digidatasistemas.starterPackage.security.UsuarioAutenticado;
 import br.com.digidatasistemas.starterPackage.service.IPerfilService;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import br.com.digidatasistemas.starterPackage.service.IPermissaoService;
+import br.com.digidatasistemas.starterPackage.service.IRecursoService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import java.util.Set;
 import java.util.UUID;
 
 import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_RECURSO_JA_EXITESNTE;
@@ -25,88 +29,180 @@ import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_R
 public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilService<Perfil> {
 
     private final PerfilRepository repository;
-    private final UsuarioAutenticado usuarioAutenticado;
+    private final IRecursoService<Recurso> recursoService;
+    private final IPermissaoService<Permissao> permissaoService;
 
-    public PerfilService(PerfilRepository repository, UsuarioAutenticado usuarioAutenticado) {
+    public PerfilService(
+            PerfilRepository repository,
+            IRecursoService<Recurso> recursoService,
+            IPermissaoService<Permissao> permissaoService
+    ) {
         super(repository);
         this.repository = repository;
-        this.usuarioAutenticado = usuarioAutenticado;
+        this.recursoService = recursoService;
+        this.permissaoService = permissaoService;
     }
 
     @Override
+    @Transactional
     public Perfil create(Perfil perfil) {
-        if(exitePerfilComEsseNome(perfil.getNome())){
-            throw new ConflictException(MSG_RECURSO_JA_EXITESNTE + " com esse nome: " + perfil.getNome());
+        validarPerfil(perfil);
+        String nome = perfil.getNome().trim();
+
+        if (repository.existsByNomeIgnoreCase(nome)) {
+            throw conflitoNome(nome);
         }
-        perfil.setChave(perfil.getNome().toUpperCase());
+
+        perfil.setNome(nome);
+        perfil.setChave(gerarChave(nome));
+        perfil.setAtivo(perfil.getAtivo() != null ? perfil.getAtivo() : Boolean.TRUE);
+        perfil.setPerfilRecursos(montarNovasAssociacoes(perfil, perfil.getPerfilRecursos()));
+
         return repository.save(perfil);
     }
 
-    public boolean exitePerfilComEsseNome(String nome) {
-        return repository.existsByNome(nome);
-    }
-
+    @Override
+    @Transactional
     public Perfil update(UUID id, Perfil perfil) {
+        validarPerfil(perfil);
+        Perfil perfilSalvo = super.findById(id);
+        String nome = perfil.getNome().trim();
 
-        Perfil perfilSave = this.findById(id);
-
-        perfilSave.setNome(perfil.getNome());
-        perfilSave.setAtivo(perfil.getAtivo());
-        perfilSave.setDescricao(perfil.getDescricao());
-
-        List<PerfilRecurso> existingResources =
-                perfilSave.getPerfilRecursos();
-
-        List<PerfilRecurso> incomingResources =
-                perfil.getPerfilRecursos();
-
-        Map<UUID, PerfilRecurso> existingByResourceId =
-                existingResources.stream()
-                        .collect(Collectors.toMap(
-                                resource -> resource.getRecurso().getId(),
-                                Function.identity()
-                        ));
-
-        // Atualiza ou adiciona
-        for (PerfilRecurso incoming : incomingResources) {
-
-            UUID resourceId = incoming.getRecurso().getId();
-
-            PerfilRecurso existing =
-                    existingByResourceId.get(resourceId);
-
-            if (existing != null) {
-
-                // NÃO troca o objeto.
-                // Mantém o ProfileResource que já está gerenciado pelo Hibernate.
-
-                existing.setRecurso(incoming.getRecurso());
-                existing.setPermissoes(incoming.getPermissoes());
-
-            } else {
-
-                // É um novo ProfileResource
-                incoming.setPerfil(perfilSave);
-
-                existingResources.add(incoming);
-            }
+        if (repository.existsByNomeIgnoreCaseAndIdNot(nome, id)) {
+            throw conflitoNome(nome);
         }
 
-        // Remove os que não vieram na requisição
-        existingResources.removeIf(existing ->
-                incomingResources.stream()
-                        .noneMatch(incoming ->
-                                incoming.getRecurso().getId()
-                                        .equals(existing.getRecurso().getId())
-                        )
-        );
+        perfilSalvo.setNome(nome);
+        perfilSalvo.setChave(gerarChave(nome));
+        perfilSalvo.setDescricao(perfil.getDescricao());
+        if (perfil.getAtivo() != null) {
+            perfilSalvo.setAtivo(perfil.getAtivo());
+        }
 
-        return this.repository.save(perfilSave);
+        atualizarAssociacoes(perfilSalvo, perfil.getPerfilRecursos());
+        return repository.save(perfilSalvo);
     }
-
 
     @Override
     public boolean existsById(UUID id) {
         return repository.existsById(id);
+    }
+
+    private List<PerfilRecurso> montarNovasAssociacoes(
+            Perfil perfil,
+            List<PerfilRecurso> associacoesRecebidas
+    ) {
+        Map<UUID, AssociacaoCarregada> associacoes = carregarAssociacoes(associacoesRecebidas);
+        List<PerfilRecurso> resultado = new ArrayList<>();
+
+        associacoes.forEach((recursoId, associacao) -> resultado.add(
+                PerfilRecurso.builder()
+                        .perfil(perfil)
+                        .recurso(associacao.recurso())
+                        .permissoes(associacao.permissoes())
+                        .build()
+        ));
+
+        return resultado;
+    }
+
+    private void atualizarAssociacoes(Perfil perfil, List<PerfilRecurso> associacoesRecebidas) {
+        Map<UUID, AssociacaoCarregada> associacoes = carregarAssociacoes(associacoesRecebidas);
+        List<PerfilRecurso> atuais = perfil.getPerfilRecursos();
+
+        if (atuais == null) {
+            atuais = new ArrayList<>();
+            perfil.setPerfilRecursos(atuais);
+        }
+
+        Map<UUID, PerfilRecurso> atuaisPorRecurso = new HashMap<>();
+        for (PerfilRecurso atual : atuais) {
+            atuaisPorRecurso.put(atual.getRecurso().getId(), atual);
+        }
+
+        atuais.removeIf(atual -> !associacoes.containsKey(atual.getRecurso().getId()));
+
+        for (Map.Entry<UUID, AssociacaoCarregada> entry : associacoes.entrySet()) {
+            UUID recursoId = entry.getKey();
+            PerfilRecurso atual = atuaisPorRecurso.get(recursoId);
+
+            if (atual == null) {
+                atuais.add(PerfilRecurso.builder()
+                        .perfil(perfil)
+                        .recurso(entry.getValue().recurso())
+                        .permissoes(entry.getValue().permissoes())
+                        .build());
+            } else {
+                atual.setRecurso(entry.getValue().recurso());
+                atual.setPermissoes(entry.getValue().permissoes());
+            }
+        }
+    }
+
+    private Map<UUID, AssociacaoCarregada> carregarAssociacoes(List<PerfilRecurso> recebidas) {
+        List<PerfilRecurso> associacoes = recebidas == null ? List.of() : recebidas;
+        Map<UUID, AssociacaoCarregada> resultado = new java.util.LinkedHashMap<>();
+        Set<UUID> recursosEncontrados = new HashSet<>();
+
+        for (PerfilRecurso associacao : associacoes) {
+            if (associacao == null || associacao.getRecurso() == null || associacao.getRecurso().getId() == null) {
+                throw new BusinessException("Recurso do perfil é obrigatório.");
+            }
+
+            UUID recursoId = associacao.getRecurso().getId();
+            if (!recursosEncontrados.add(recursoId)) {
+                throw new BusinessException("O mesmo recurso não pode ser informado mais de uma vez no perfil.");
+            }
+
+            Recurso recurso = recursoService.findById(recursoId);
+            if (!Boolean.TRUE.equals(recurso.getAtivo())) {
+                throw new BusinessException("Não é possível associar um recurso inativo ao perfil.");
+            }
+
+            List<Permissao> permissoes = carregarPermissoes(associacao.getPermissoes());
+            resultado.put(recursoId, new AssociacaoCarregada(recurso, permissoes));
+        }
+
+        return resultado;
+    }
+
+    private List<Permissao> carregarPermissoes(List<Permissao> recebidas) {
+        List<Permissao> permissoes = recebidas == null ? List.of() : recebidas;
+        List<Permissao> resultado = new ArrayList<>();
+        Set<UUID> idsEncontrados = new HashSet<>();
+
+        for (Permissao recebida : permissoes) {
+            if (recebida == null || recebida.getId() == null) {
+                throw new BusinessException("Permissão do recurso é obrigatória.");
+            }
+            if (!idsEncontrados.add(recebida.getId())) {
+                throw new BusinessException("A mesma permissão não pode ser informada mais de uma vez para o recurso.");
+            }
+
+            Permissao permissao = permissaoService.findById(recebida.getId());
+            if (!Boolean.TRUE.equals(permissao.getAtivo())) {
+                throw new BusinessException("Não é possível associar uma permissão inativa ao perfil.");
+            }
+            resultado.add(permissao);
+        }
+
+        return resultado;
+    }
+
+    private void validarPerfil(Perfil perfil) {
+        if (perfil == null || perfil.getNome() == null || perfil.getNome().isBlank()) {
+            throw new BusinessException("Nome do perfil é obrigatório.");
+        }
+    }
+
+    private String gerarChave(String nome) {
+        return nome.toUpperCase(Locale.ROOT);
+    }
+
+    private ConflictException conflitoNome(String nome) {
+        return new ConflictException(MSG_RECURSO_JA_EXITESNTE + " com esse nome: " + nome);
+    }
+
+    private record AssociacaoCarregada(Recurso recurso, List<Permissao> permissoes) {
     }
 }

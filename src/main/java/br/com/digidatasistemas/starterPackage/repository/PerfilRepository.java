@@ -6,5 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface PerfilRepository extends JpaRepository<Perfil, UUID> {
-    boolean existsByNome(String nome);
+    boolean existsByNomeIgnoreCase(String nome);
+
+    boolean existsByNomeIgnoreCaseAndIdNot(String nome, UUID id);
 }

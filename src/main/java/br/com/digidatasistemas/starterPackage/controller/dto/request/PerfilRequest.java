@@ -5,6 +5,8 @@ import br.com.digidatasistemas.starterPackage.model.Perfil;
 import br.com.digidatasistemas.starterPackage.model.Permissao;
 import br.com.digidatasistemas.starterPackage.model.PerfilRecurso;
 import br.com.digidatasistemas.starterPackage.model.Recurso;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -18,7 +20,10 @@ import java.util.stream.Collectors;
 public class PerfilRequest implements IRequest<PerfilRequest, Perfil> {
 
     private UUID id;
+    @NotBlank(message = "Nome é obrigatório")
+    @Size(max = 100, message = "Nome deve possuir no máximo 100 caracteres")
     private String nome;
+    @Size(max = 255, message = "Descrição deve possuir no máximo 255 caracteres")
     private String descricao;
     private Boolean ativo = Boolean.TRUE;
 
@@ -30,19 +35,22 @@ public class PerfilRequest implements IRequest<PerfilRequest, Perfil> {
         Perfil perfil = Perfil.builder()
                 .id(perfilRequest.getId())
                 .nome(perfilRequest.getNome())
-                .chave(perfilRequest.getNome().toUpperCase())
                 .descricao(perfilRequest.getDescricao())
                 .ativo(perfilRequest.getAtivo())
                 .build();
 
         List<PerfilRecurso> perfilRecursos = new ArrayList<>();
 
-        perfilRequest.getPerfilRecurso().forEach((resourceId, permissionIds) -> {
+        Map<UUID, List<UUID>> associacoes = perfilRequest.getPerfilRecurso() == null
+                ? Collections.emptyMap()
+                : perfilRequest.getPerfilRecurso();
+
+        associacoes.forEach((resourceId, permissionIds) -> {
 
             Recurso recurso = new Recurso();
             recurso.setId(resourceId);
 
-            List<Permissao> permissaos = permissionIds.stream()
+            List<Permissao> permissaos = (permissionIds == null ? List.<UUID>of() : permissionIds).stream()
                     .map(permissionId -> {
                         Permissao permissao = new Permissao();
                         permissao.setId(permissionId);

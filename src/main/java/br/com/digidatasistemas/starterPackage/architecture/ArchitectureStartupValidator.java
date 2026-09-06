@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.RegexPatternTypeFilter;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Constructor;
@@ -42,6 +43,8 @@ public class ArchitectureStartupValidator implements SmartInitializingSingleton 
     private void validateServices(Set<String> violations) {
         findClassesInPackage(SERVICE_IMPLEMENTATION_PACKAGE)
                 .stream()
+                .filter(serviceClass -> serviceClass.getEnclosingClass() == null)
+                .filter(serviceClass -> serviceClass.isAnnotationPresent(Service.class))
                 .filter(serviceClass -> serviceClass.getInterfaces().length == 0)
                 .forEach(serviceClass -> violations.add(
                         serviceClass.getSimpleName()

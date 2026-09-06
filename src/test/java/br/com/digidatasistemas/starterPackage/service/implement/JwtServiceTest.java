@@ -1,5 +1,6 @@
 package br.com.digidatasistemas.starterPackage.service.implement;
 
+import br.com.digidatasistemas.starterPackage.model.Perfil;
 import br.com.digidatasistemas.starterPackage.model.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -73,11 +74,18 @@ class JwtServiceTest {
     }
 
     private Usuario usuario(boolean active) {
+        Perfil perfil = Perfil.builder()
+                        .nome("Administrador")
+                        .chave("ADMIN")
+                        .ativo(true)
+                        .build();
+
         return Usuario.builder()
                 .cpf("00000000535")
                 .name("Usuário Teste")
                 .password("hash")
                 .active(active)
+                .perfil(perfil)
                 .build();
     }
 }

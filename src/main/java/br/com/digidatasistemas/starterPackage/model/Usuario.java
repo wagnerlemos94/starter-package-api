@@ -7,9 +7,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -46,9 +47,9 @@ public class Usuario implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        List<GrantedAuthority> authorities = new ArrayList<>();
+        Collection<GrantedAuthority> authorities = new LinkedHashSet<>();
 
-        if (perfil == null) {
+        if (perfil == null || !Boolean.TRUE.equals(perfil.getAtivo())) {
             return authorities;
         }
 
@@ -60,20 +61,35 @@ public class Usuario implements UserDetails {
         );
 
         // Permissões dos recursos
-        perfil.getPerfilRecursos().forEach(profileResource -> {
+        List<PerfilRecurso> perfilRecursos = perfil.getPerfilRecursos() == null
+                ? List.of()
+                : perfil.getPerfilRecursos();
+
+        perfilRecursos.stream()
+                .filter(Objects::nonNull)
+                .filter(profileResource -> profileResource.getRecurso() != null)
+                .filter(profileResource -> Boolean.TRUE.equals(profileResource.getRecurso().getAtivo()))
+                .forEach(profileResource -> {
 
             String resource = profileResource
                     .getRecurso()
                     .getChave();
 
-            profileResource.getPermissoes().forEach(permission -> {
+            List<Permissao> permissoes = profileResource.getPermissoes() == null
+                    ? List.of()
+                    : profileResource.getPermissoes();
+
+            permissoes.stream()
+                    .filter(Objects::nonNull)
+                    .filter(permission -> Boolean.TRUE.equals(permission.getAtivo()))
+                    .forEach(permission -> {
 
                 authorities.add(
                         new SimpleGrantedAuthority(
                                 resource + ":" + permission.getChave()
                         )
                 );
-            });
+                    });
         });
 
         return authorities;
@@ -101,6 +117,8 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return Boolean.TRUE.equals(active);
+        return Boolean.TRUE.equals(active)
+                && perfil != null
+                && Boolean.TRUE.equals(perfil.getAtivo());
     }
 }

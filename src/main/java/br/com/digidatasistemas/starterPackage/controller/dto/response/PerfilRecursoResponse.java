@@ -20,13 +20,16 @@ public class PerfilRecursoResponse implements IResponse<PerfilRecurso, PerfilRec
     private UUID id;
     private UUID recursoId;
     private String recurso;
+    @Builder.Default
     private List<PermissaoResponse> permissoes = new ArrayList<>();
 
     public PerfilRecursoResponse(PerfilRecurso perfilRecurso) {
         this.id = perfilRecurso.getId();
         this.recursoId = perfilRecurso.getRecurso().getId();
         this.recurso = perfilRecurso.getRecurso().getNome();
-        this.permissoes = perfilRecurso.getPermissoes().stream().map(PermissaoResponse::new).toList();
+        this.permissoes = perfilRecurso.getPermissoes() == null
+                ? List.of()
+                : perfilRecurso.getPermissoes().stream().map(PermissaoResponse::new).toList();
     }
 
     @Override

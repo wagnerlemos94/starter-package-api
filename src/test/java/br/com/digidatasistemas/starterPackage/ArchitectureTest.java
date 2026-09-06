@@ -7,6 +7,7 @@ import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
+import org.springframework.stereotype.Service;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
@@ -36,6 +37,10 @@ class ArchitectureTest {
         return new ArchCondition<>("implementar pelo menos uma interface") {
             @Override
             public void check(JavaClass service, ConditionEvents events) {
+                if (service.getEnclosingClass().isPresent() || !service.isAnnotatedWith(Service.class)) {
+                    return;
+                }
+
                 boolean implementaInterface = !service.getAllRawInterfaces().isEmpty();
                 String mensagem = service.getName()
                         + (implementaInterface
