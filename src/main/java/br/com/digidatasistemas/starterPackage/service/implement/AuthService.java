@@ -4,14 +4,14 @@ import br.com.digidatasistemas.starterPackage.controller.dto.request.LoginReques
 import br.com.digidatasistemas.starterPackage.controller.dto.response.LoginResponse;
 import br.com.digidatasistemas.starterPackage.exception.UnauthorizedException;
 import br.com.digidatasistemas.starterPackage.model.Usuario;
-import br.com.digidatasistemas.starterPackage.repository.UsuarioRepository;
 import br.com.digidatasistemas.starterPackage.service.IAuthService;
+import br.com.digidatasistemas.starterPackage.service.IJwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -21,8 +21,7 @@ import java.util.*;
 public class AuthService implements IAuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final UsuarioRepository repository;
-    private final JwtService jwtService;
+    private final IJwtService jwtService;
 
     public LoginResponse login(LoginRequest request) {
 
@@ -35,7 +34,9 @@ public class AuthService implements IAuthService {
                             request.password()
                     )
             );
-        } catch (BadCredentialsException | InternalAuthenticationServiceException e) {
+        } catch (DisabledException e) {
+            throw new UnauthorizedException("Usuário inativo");
+        } catch (AuthenticationException e) {
             throw new UnauthorizedException("Usuário ou senha inválidos");
         }
 
@@ -56,7 +57,7 @@ public class AuthService implements IAuthService {
 
         return new LoginResponse(
                 token,
-                "",
+                jwtService.getExpirationMillis(),
                 usuario.getName(),
                 usuario.getCpf(),
                 resources

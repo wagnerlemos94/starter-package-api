@@ -47,7 +47,7 @@ $env:GITHUB_TOKEN = "seu-token"
 | `JWT_SECRET` | Sim | Segredo HMAC forte, com pelo menos 32 bytes | `uma-chave-longa-com-32-bytes-ou-mais` |
 | `JWT_EXPIRATION` | Não | Expiração configurada em milissegundos; padrão `86400000` | `86400000` |
 
-> Na implementação atual, `JwtService` fixa a expiração do token em um dia. Alterar `JWT_EXPIRATION` ainda não muda a validade efetiva do JWT.
+O valor de `JWT_EXPIRATION` controla a validade efetiva do claim `exp` do JWT e também é retornado no login.
 
 Exemplo para desenvolvimento no PowerShell:
 
@@ -83,7 +83,7 @@ Resposta `200 OK`:
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiJ9...",
-  "expiresInToken": "",
+  "expiresInToken": 86400000,
   "nome": "Nome do usuário",
   "username": "00000000000",
   "resource": {
@@ -93,7 +93,7 @@ Resposta `200 OK`:
 }
 ```
 
-`expiresInToken` é retornado como string vazia. A expiração real está no claim `exp` do JWT.
+`expiresInToken` informa, em milissegundos, o mesmo período configurado em `JWT_EXPIRATION`. A data absoluta de expiração também está no claim `exp` do JWT.
 
 Credenciais inválidas retornam `401 Unauthorized`:
 
@@ -440,8 +440,6 @@ A segurança libera `/actuator/health`, mas o `pom.xml` ainda não inclui Spring
 - Troque ou remova todos os dados iniciais das migrations.
 - Injete segredos JWT pelo ambiente ou por um cofre de segredos.
 - Restrinja CORS aos domínios confiáveis.
-- Corrija `expiresInToken` ou remova-o do contrato.
-- Faça `JWT_EXPIRATION` controlar a expiração real do token.
 - Adicione validações Jakarta aos DTOs de entrada.
 - Confirme o fluxo de definição de senha na criação de usuários.
 - Adicione testes de integração para autenticação, CRUD e autorização por recurso.

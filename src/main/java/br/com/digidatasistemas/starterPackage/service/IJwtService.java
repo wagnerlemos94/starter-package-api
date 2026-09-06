@@ -1,9 +1,11 @@
 package br.com.digidatasistemas.starterPackage.service;
 
-import br.com.digidatasistemas.starterPackage.model.Usuario;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface IJwtService {
 
-    String generateToken(Usuario usuario);
+    String generateToken(UserDetails usuario);
     String extractUsername(String token);
+    boolean isTokenValid(String token, UserDetails usuario);
+    long getExpirationMillis();
 }

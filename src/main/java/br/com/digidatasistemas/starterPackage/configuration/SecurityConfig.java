@@ -1,7 +1,9 @@
 package br.com.digidatasistemas.starterPackage.configuration;
 
 import br.com.digidatasistemas.starterPackage.security.JwtAuthenticationFilter;
-import br.com.digidatasistemas.starterPackage.service.implement.CustomUserDetailsService;
+import br.com.digidatasistemas.starterPackage.security.RestAccessDeniedHandler;
+import br.com.digidatasistemas.starterPackage.security.RestAuthenticationEntryPoint;
+import br.com.digidatasistemas.starterPackage.service.IUsuarioDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +26,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
-    private final CustomUserDetailsService userDetailsService;
+    private final IUsuarioDetailsService userDetailsService;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final RestAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,6 +51,11 @@ public class SecurityConfig {
         return http
 
                 .csrf(AbstractHttpConfigurer::disable)
+
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
 
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(

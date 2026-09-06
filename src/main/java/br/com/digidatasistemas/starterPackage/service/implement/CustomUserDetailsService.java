@@ -2,14 +2,15 @@ package br.com.digidatasistemas.starterPackage.service.implement;
 
 import br.com.digidatasistemas.starterPackage.model.Usuario;
 import br.com.digidatasistemas.starterPackage.repository.UsuarioRepository;
+import br.com.digidatasistemas.starterPackage.service.IUsuarioDetailsService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService
-        implements UserDetailsService {
+        implements IUsuarioDetailsService {
 
     private final UsuarioRepository repository;
 
@@ -18,6 +19,6 @@ public class CustomUserDetailsService
             String cpf) {
 
         return repository.findByCpf(cpf)
-                .orElseThrow();
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
     }
 }

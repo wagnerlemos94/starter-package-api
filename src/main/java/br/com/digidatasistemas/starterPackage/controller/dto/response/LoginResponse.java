@@ -5,7 +5,7 @@ import java.util.Map;
 
 public record LoginResponse(
         String token,
-        String expiresInToken,
+        Long expiresInToken,
         String nome,
         String username,
         Map<String, List<String>> resource

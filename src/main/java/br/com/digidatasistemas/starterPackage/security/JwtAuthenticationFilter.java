@@ -1,10 +1,8 @@
 package br.com.digidatasistemas.starterPackage.security;
 
-import br.com.digidatasistemas.starterPackage.exception.ErrorResponse;
 import br.com.digidatasistemas.starterPackage.model.Usuario;
-import br.com.digidatasistemas.starterPackage.service.implement.CustomUserDetailsService;
-import br.com.digidatasistemas.starterPackage.service.implement.JwtService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import br.com.digidatasistemas.starterPackage.service.IJwtService;
+import br.com.digidatasistemas.starterPackage.service.IUsuarioDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -16,24 +14,22 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
-    private final CustomUserDetailsService userDetailsService;
-    private final ObjectMapper objectMapper;
+    private final IJwtService jwtService;
+    private final IUsuarioDetailsService userDetailsService;
+    private final SecurityErrorResponseWriter errorWriter;
 
     @Override
     protected void doFilterInternal(
@@ -53,13 +49,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String token = header.substring(7);
 
-            String email = jwtService.extractUsername(token);
+            String cpf = jwtService.extractUsername(token);
 
-            if (email != null &&
+            if (cpf != null &&
                     SecurityContextHolder.getContext().getAuthentication() == null) {
 
                 Usuario usuario =
-                        userDetailsService.loadUserByUsername(email);
+                        userDetailsService.loadUserByUsername(cpf);
 
                 if (jwtService.isTokenValid(token, usuario)) {
 
@@ -71,6 +67,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     SecurityContextHolder.getContext()
                             .setAuthentication(authentication);
+                } else {
+                    unauthorized(response, request, "Token inválido ou usuário inativo.");
+                    return;
                 }
             }
 
@@ -96,6 +95,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (JwtException ex) {
 
             unauthorized(response, request, "Falha na autenticação.");
+        } catch (UsernameNotFoundException ex) {
+
+            unauthorized(response, request, "Token inválido ou usuário inativo.");
+        } catch (IllegalArgumentException ex) {
+
+            unauthorized(response, request, "Token inválido.");
         }
     }
 
@@ -104,20 +109,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             String message) throws IOException {
 
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-
-        ErrorResponse body = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpServletResponse.SC_UNAUTHORIZED,
-                "UNAUTHORIZED",
-                message,
-                request.getRequestURI(),
-                UUID.randomUUID().toString(),
-                List.of()
-        );
-
-        objectMapper.writeValue(response.getWriter(), body);
+        SecurityContextHolder.clearContext();
+        errorWriter.write(response, request, HttpStatus.UNAUTHORIZED, message);
     }
 }
