@@ -396,6 +396,14 @@ Para executar todos os testes:
 .\mvnw.cmd test --settings settings.xml
 ```
 
+O JaCoCo gera o relatório de cobertura em `target/site/jacoco/index.html`. Para executar os testes e também validar os limites mínimos de cobertura:
+
+```powershell
+.\mvnw.cmd verify --settings settings.xml
+```
+
+O build falha quando a cobertura total ficar abaixo de **85% das linhas** ou **75% dos branches**. Assim, novos códigos sem testes não reduzem silenciosamente a cobertura do projeto.
+
 Para executar somente a suíte de integração da segurança e do contrato HTTP:
 
 ```powershell
