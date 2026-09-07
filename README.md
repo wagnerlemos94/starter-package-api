@@ -464,13 +464,26 @@ Erros de validação retornam `400`, recursos não encontrados `404`, duplicidad
 
 ### Health check
 
-A segurança libera `/actuator/health`, mas o `pom.xml` ainda não inclui Spring Boot Actuator. O health check só estará disponível depois que essa dependência for adicionada.
+O Spring Boot Actuator disponibiliza o health check público em:
+
+```http
+GET /api/actuator/health
+```
+
+Quando a aplicação estiver saudável, a resposta será:
+
+```json
+{
+  "status": "UP"
+}
+```
+
+Somente o endpoint `health` é exposto e seus detalhes internos não são enviados na resposta.
 
 ## Observações para produção
 
 - Defina um processo seguro e específico do projeto para criar o primeiro administrador; o starter não fornece usuário padrão.
 - Injete segredos JWT pelo ambiente ou por um cofre de segredos.
-- Restrinja CORS aos domínios confiáveis.
-- Adicione validações Jakarta aos DTOs de entrada.
+- Configure `CORS_ALLOWED_ORIGINS` somente com os domínios confiáveis de cada ambiente.
 - Confirme o fluxo de definição de senha na criação de usuários.
 - Adicione testes de integração para autenticação, CRUD e autorização por recurso.
