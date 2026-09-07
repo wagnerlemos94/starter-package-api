@@ -60,7 +60,23 @@ $env:JWT_SECRET = "substitua-por-uma-chave-segura-de-32-bytes"
 .\mvnw.cmd spring-boot:run --settings settings.xml
 ```
 
-As migrations criam o esquema e dados iniciais, incluindo um perfil administrador, um usuário inicial, os quatro recursos e as permissões CRUD. Revise ou remova os dados iniciais antes de usar o template em produção.
+As migrations criam o esquema, o perfil administrador, os quatro recursos e as permissões CRUD. Por segurança, o starter **não cria um usuário inicial nem fornece uma senha padrão**.
+
+Antes do primeiro login, cada projeto deve definir sua própria estratégia de criação do administrador. Uma opção é adicionar uma migration exclusiva do projeto, usando CPF, nome e senha próprios. A senha deve ser armazenada como hash BCrypt, nunca em texto puro:
+
+```sql
+INSERT INTO usuario (id, cpf, password, name, active, profile_id)
+VALUES (
+    gen_random_uuid(),
+    'CPF_DO_ADMINISTRADOR',
+    'HASH_BCRYPT_DA_SENHA',
+    'Administrador',
+    TRUE,
+    'a747e317-12b2-4e97-82ac-d583ea704141'
+);
+```
+
+Não coloque uma credencial real no starter ou em um repositório público. Em produção, prefira um processo de bootstrap controlado ou uma credencial temporária que obrigue a troca da senha no primeiro acesso.
 
 ## Autenticação
 
@@ -447,7 +463,7 @@ A segurança libera `/actuator/health`, mas o `pom.xml` ainda não inclui Spring
 
 ## Observações para produção
 
-- Troque ou remova todos os dados iniciais das migrations.
+- Defina um processo seguro e específico do projeto para criar o primeiro administrador; o starter não fornece usuário padrão.
 - Injete segredos JWT pelo ambiente ou por um cofre de segredos.
 - Restrinja CORS aos domínios confiáveis.
 - Adicione validações Jakarta aos DTOs de entrada.

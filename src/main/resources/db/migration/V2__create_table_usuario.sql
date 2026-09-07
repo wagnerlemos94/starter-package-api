@@ -9,7 +9,3 @@ CREATE TABLE usuario (
                            FOREIGN KEY (profile_id)
                             REFERENCES perfil (id)
 );
-
-INSERT INTO public.usuario
-(id, cpf, "password", "name", active, profile_id)
-VALUES('a2b2f256-9368-4fae-8669-7966bca28940'::uuid, '00000000535', '$2a$10$OWCFTMPGNDEmstnRog2Zx.VAYxa47cdpQteXz0eT6xV7GcJsyqYSC', 'Admin admin', true, 'a747e317-12b2-4e97-82ac-d583ea704141'::uuid);
