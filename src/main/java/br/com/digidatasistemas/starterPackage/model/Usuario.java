@@ -40,7 +40,7 @@ public class Usuario implements UserDetails {
     @Builder.Default
     private Boolean active = Boolean.TRUE;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id")
     private Perfil perfil;
 

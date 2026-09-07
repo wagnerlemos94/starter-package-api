@@ -14,3 +14,5 @@ security:
   jwt:
     secret: chave-de-teste-com-pelo-menos-trinta-e-dois-bytes
     expiration: 3600000
+  cors:
+    allowed-origins: http://localhost:3000

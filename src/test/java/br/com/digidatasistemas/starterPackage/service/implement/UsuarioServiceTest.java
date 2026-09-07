@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +49,15 @@ class UsuarioServiceTest {
     @BeforeEach
     void setUp() {
         usuarioService = new UsuarioService(usuarioRepository, passwordEncoder, perfilService);
+    }
+
+    @Test
+    void deveInicializarAutoridadesAoCarregarUsuarioParaAutenticacao() {
+        Usuario usuario = mock(Usuario.class);
+        when(usuarioRepository.findByCpf(CPF)).thenReturn(Optional.of(usuario));
+
+        assertSame(usuario, usuarioService.loadUserByUsername(CPF));
+        verify(usuario).getAuthorities();
     }
 
     @Test

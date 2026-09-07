@@ -33,7 +33,7 @@ public class Permissao {
     @Builder.Default
     private Boolean ativo = Boolean.TRUE;
 
-    @ManyToMany(mappedBy = "permissoes", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "permissoes", fetch = FetchType.LAZY)
     @Builder.Default
     private List<PerfilRecurso> perfilRecursos = new ArrayList<>();
 }

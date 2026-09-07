@@ -28,21 +28,21 @@ public class PerfilRecurso {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
             name = "perfil_id",
             nullable = false
     )
     private Perfil perfil;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
             name = "recurso_id",
             nullable = false
     )
     private Recurso recurso;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "perfil_recurso_permissao",
             joinColumns = @JoinColumn(name = "perfil_recurso_id"),

@@ -10,6 +10,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class CustomUserDetailsServiceTest {
@@ -19,10 +21,11 @@ class CustomUserDetailsServiceTest {
 
     @Test
     void deveCarregarUsuarioPeloCpf() {
-        var usuario = Usuario.builder().cpf("00000000535").build();
+        var usuario = spy(Usuario.builder().cpf("00000000535").build());
         when(repository.findByCpf("00000000535")).thenReturn(Optional.of(usuario));
 
         assertThat(service.loadUserByUsername("00000000535")).isSameAs(usuario);
+        verify(usuario).getAuthorities();
     }
 
     @Test

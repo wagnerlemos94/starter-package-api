@@ -37,7 +37,7 @@ public class Perfil {
             mappedBy = "perfil",
             cascade = CascadeType.ALL,
             orphanRemoval = true,
-            fetch = FetchType.EAGER
+            fetch = FetchType.LAZY
     )
     @Builder.Default
     private List<PerfilRecurso> perfilRecursos = new ArrayList<>();

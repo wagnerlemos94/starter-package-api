@@ -161,6 +161,8 @@ public class PedidoService {
 
 Os métodos disponíveis são `get()`, `getId()` e `getCpf()`. Quando não existir um `Usuario` autenticado, o componente lança `AccessDeniedException`.
 
+Os relacionamentos JPA são carregados sob demanda (`LAZY`) para evitar que consultas simples tragam automaticamente todo o grafo de perfil, recursos e permissões. No fluxo de autenticação, as autoridades são inicializadas dentro da transação do serviço antes de o usuário ser entregue ao Spring Security.
+
 ## Contrato CRUD
 
 Os quatro recursos seguem o mesmo conjunto de rotas, fornecido por `crud-core`:

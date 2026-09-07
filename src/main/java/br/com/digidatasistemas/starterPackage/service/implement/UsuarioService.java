@@ -34,13 +34,17 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
     }
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String cpf)
             throws UsernameNotFoundException {
 
-        return usuarioRepository.findByCpf(cpf)
+        Usuario usuario = usuarioRepository.findByCpf(cpf)
                 .orElseThrow(
                         () -> new UsernameNotFoundException(cpf)
                 );
+
+        usuario.getAuthorities();
+        return usuario;
     }
 
     @Transactional
