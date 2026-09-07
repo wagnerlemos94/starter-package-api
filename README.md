@@ -46,6 +46,7 @@ $env:GITHUB_TOKEN = "seu-token"
 | `FLYWAY` | Sim | Ativa as migrations | `true` |
 | `JWT_SECRET` | Sim | Segredo HMAC forte, com pelo menos 32 bytes | `uma-chave-longa-com-32-bytes-ou-mais` |
 | `JWT_EXPIRATION` | Não | Expiração configurada em milissegundos; padrão `86400000` | `86400000` |
+| `CORS_ALLOWED_ORIGINS` | Não | Origens autorizadas, separadas por vírgula | `http://localhost:3000,https://app.exemplo.com` |
 
 O valor de `JWT_EXPIRATION` controla a validade efetiva do claim `exp` do JWT e também é retornado no login.
 
@@ -57,8 +58,11 @@ $env:DB_USER = "postgres"
 $env:DB_PASS = "postgres"
 $env:FLYWAY = "true"
 $env:JWT_SECRET = "substitua-por-uma-chave-segura-de-32-bytes"
+$env:CORS_ALLOWED_ORIGINS = "http://localhost:3000,http://localhost:5173"
 .\mvnw.cmd spring-boot:run --settings settings.xml
 ```
+
+Informe em `CORS_ALLOWED_ORIGINS` somente as origens confiáveis que acessarão a API pelo navegador. Separe múltiplas origens por vírgula e não inclua caminhos, por exemplo: `https://app.exemplo.com`, e não `https://app.exemplo.com/login`.
 
 As migrations criam o esquema, o perfil administrador, os quatro recursos e as permissões CRUD. Por segurança, o starter **não cria um usuário inicial nem fornece uma senha padrão**.
 
@@ -417,6 +421,7 @@ docker run --rm -p 8085:8085 \
   -e DB_PASS=postgres \
   -e FLYWAY=true \
   -e JWT_SECRET=uma-chave-longa-com-32-bytes-ou-mais \
+  -e CORS_ALLOWED_ORIGINS=https://app.exemplo.com \
   starter-package-api
 ```
 
