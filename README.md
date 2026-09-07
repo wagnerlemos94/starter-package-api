@@ -376,6 +376,14 @@ Para executar todos os testes:
 .\mvnw.cmd test --settings settings.xml
 ```
 
+Para executar somente a suíte de integração da segurança e do contrato HTTP:
+
+```powershell
+.\mvnw.cmd -Dtest=SecurityApiIntegrationTest test --settings settings.xml
+```
+
+Essa suíte utiliza `MockMvc`, a configuração real do Spring Security e serviços simulados. Ela não acessa o PostgreSQL e define o perfil `test` apenas dentro do próprio teste.
+
 O Maven precisa das variáveis `GITHUB_USERNAME` e `GITHUB_TOKEN` para baixar a dependência privada `crud-core` do GitHub Packages. Sem credenciais válidas, a compilação termina com `401 Unauthorized` antes de executar o ArchUnit.
 
 ## Docker
