@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.UUID;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_RECURSO_OBRIGATORIO;
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
 
 @Getter
 @Setter
@@ -22,18 +22,18 @@ import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_R
 public class UsuarioRequest implements IRequest<UsuarioRequest, Usuario> {
 
     private UUID id;
-    @NotBlank(message = "cpf é " + MSG_RECURSO_OBRIGATORIO)
+    @NotBlank(message = MSG_CPF_OBRIGATORIO)
     @Pattern(
             regexp = "\\d{11}",
-            message = "CPF deve conter exatamente 11 números"
+            message = MSG_CPF_INVALIDO
     )
     private String cpf;
-    @NotBlank(message = "Nome é " + MSG_RECURSO_OBRIGATORIO)
-    @Size(max = 150, message = "Nome deve possuir no máximo 150 caracteres")
+    @NotBlank(message = MSG_NOME_OBRIGATORIO)
+    @Size(max = 150, message = MSG_NOME_MAXIMO_150)
     private String name;
-    @NotNull(message = "Perfil é " + MSG_RECURSO_OBRIGATORIO)
+    @NotNull(message = MSG_PERFIL_OBRIGATORIO)
     private UUID profileId;
-    @Size(min = 8, max = 72)
+    @Size(min = 8, max = 72, message = MSG_SENHA_TAMANHO_INVALIDO)
     private String password;
     private Boolean active;
 

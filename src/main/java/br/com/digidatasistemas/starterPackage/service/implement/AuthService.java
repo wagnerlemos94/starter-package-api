@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_INATIVO;
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_OU_SENHA_INVALIDOS;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService implements IAuthService {
@@ -35,9 +38,9 @@ public class AuthService implements IAuthService {
                     )
             );
         } catch (DisabledException e) {
-            throw new UnauthorizedException("Usuário inativo");
+            throw new UnauthorizedException(MSG_USUARIO_INATIVO);
         } catch (AuthenticationException e) {
-            throw new UnauthorizedException("Usuário ou senha inválidos");
+            throw new UnauthorizedException(MSG_USUARIO_OU_SENHA_INVALIDOS);
         }
 
         Usuario usuario = (Usuario) authentication.getPrincipal();

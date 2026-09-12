@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_NAO_ENCONTRADO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -14,10 +15,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class CustomUserDetailsServiceTest {
+class SecurityUsuarioDetailsServiceTest {
 
     private final UsuarioRepository repository = mock(UsuarioRepository.class);
-    private final CustomUserDetailsService service = new CustomUserDetailsService(repository);
+    private final SecurityUsuarioDetailsService service = new SecurityUsuarioDetailsService(repository);
 
     @Test
     void deveCarregarUsuarioPeloCpf() {
@@ -34,6 +35,6 @@ class CustomUserDetailsServiceTest {
 
         assertThatThrownBy(() -> service.loadUserByUsername("00000000535"))
                 .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessage("Usuário não encontrado");
+                .hasMessage(MSG_USUARIO_NAO_ENCONTRADO);
     }
 }

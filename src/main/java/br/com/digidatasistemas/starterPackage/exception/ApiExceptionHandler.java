@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
+
 @Slf4j
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -31,7 +33,7 @@ public class ApiExceptionHandler {
                 .map(error -> new FieldErrorResponse(error.getField(), error.getDefaultMessage()))
                 .toList();
 
-        return response(HttpStatus.BAD_REQUEST, "Dados inválidos", request, errors);
+        return response(HttpStatus.BAD_REQUEST, MSG_DADOS_INVALIDOS, request, errors);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -57,7 +59,7 @@ public class ApiExceptionHandler {
     ) {
         String message = ex instanceof ConflictException
                 ? ex.getMessage()
-                : "Não foi possível concluir a operação porque o recurso já existe ou está em uso.";
+                : MSG_CONFLITO_INTEGRIDADE;
 
         return response(HttpStatus.CONFLICT, message, request);
     }
@@ -77,7 +79,7 @@ public class ApiExceptionHandler {
     ) {
         return response(
                 HttpStatus.FORBIDDEN,
-                "Usuário não tem permissão para acessar esta funcionalidade.",
+                MSG_USUARIO_SEM_PERMISSAO,
                 request
         );
     }
@@ -92,7 +94,7 @@ public class ApiExceptionHandler {
 
         return response(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "Erro interno no servidor",
+                MSG_ERRO_INTERNO,
                 request,
                 errorId,
                 List.of()

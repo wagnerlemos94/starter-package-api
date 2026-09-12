@@ -13,6 +13,8 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_DADOS_INVALIDOS;
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_ERRO_INTERNO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -44,7 +46,7 @@ class ApiExceptionHandlerTest {
         ResponseEntity<ErrorResponse> response = handler.handleValidation(exception, request);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Dados inválidos", response.getBody().message());
+        assertEquals(MSG_DADOS_INVALIDOS, response.getBody().message());
         assertEquals(2, response.getBody().errors().size());
         assertEquals(new FieldErrorResponse("cpf", "CPF inválido"), response.getBody().errors().get(0));
     }
@@ -79,7 +81,7 @@ class ApiExceptionHandlerTest {
         );
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Erro interno no servidor", response.getBody().message());
+        assertEquals(MSG_ERRO_INTERNO, response.getBody().message());
         assertFalse(response.getBody().message().contains("senha-do-banco"));
         assertNotNull(response.getBody().errorId());
         assertFalse(response.getBody().errorId().isBlank());

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.UUID;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
+
 @Getter
 @Setter
 @Component
@@ -20,19 +22,19 @@ public class PermissaoRequest
         implements IRequest<PermissaoRequest, Permissao> {
 
     private UUID id;
-    @NotBlank(message = "Nome é obrigatório")
-    @Size(max = 100, message = "Nome deve possuir no máximo 100 caracteres")
+    @NotBlank(message = MSG_NOME_OBRIGATORIO)
+    @Size(max = 100, message = MSG_NOME_MAXIMO_100)
     private String nome;
-    @NotBlank(message = "Chave é obrigatória")
-    @Size(max = 50, message = "Chave deve possuir no máximo 50 caracteres")
+    @NotBlank(message = MSG_CHAVE_OBRIGATORIA)
+    @Size(max = 50, message = MSG_CHAVE_MAXIMO_50)
     @Pattern(
             regexp = "[A-Z][A-Z0-9_]*",
-            message = "Chave deve conter apenas letras maiúsculas, números e sublinhado"
+            message = MSG_CHAVE_FORMATO_INVALIDO
     )
     private String chave;
-    @Size(max = 255, message = "Descrição deve possuir no máximo 255 caracteres")
+    @Size(max = 255, message = MSG_DESCRICAO_MAXIMO_255)
     private String descricao;
-    @NotNull(message = "Ativo é obrigatório")
+    @NotNull(message = MSG_ATIVO_OBRIGATORIO)
     private Boolean ativo;
 
     @Override

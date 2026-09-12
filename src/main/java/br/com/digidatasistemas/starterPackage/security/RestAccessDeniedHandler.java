@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_SEM_PERMISSAO;
+
 @Component
 @RequiredArgsConstructor
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
@@ -27,7 +29,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
                 response,
                 request,
                 HttpStatus.FORBIDDEN,
-                "Usuário não tem permissão para acessar esta funcionalidade."
+                MSG_USUARIO_SEM_PERMISSAO
         );
     }
 }

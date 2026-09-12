@@ -23,6 +23,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
+
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -68,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext()
                             .setAuthentication(authentication);
                 } else {
-                    unauthorized(response, request, "Token inválido ou usuário inativo.");
+                    unauthorized(response, request, MSG_TOKEN_USUARIO_INVALIDO);
                     return;
                 }
             }
@@ -78,29 +80,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         } catch (ExpiredJwtException ex) {
 
-            unauthorized(response, request, "Token expirado.");
+            unauthorized(response, request, MSG_TOKEN_EXPIRADO);
 
         } catch (MalformedJwtException ex) {
 
-            unauthorized(response, request, "Token inválido.");
+            unauthorized(response, request, MSG_TOKEN_INVALIDO);
 
         } catch (UnsupportedJwtException ex) {
 
-            unauthorized(response, request, "Token não suportado.");
+            unauthorized(response, request, MSG_TOKEN_NAO_SUPORTADO);
 
         } catch (SignatureException ex) {
 
-            unauthorized(response, request, "Assinatura do token inválida.");
+            unauthorized(response, request, MSG_TOKEN_ASSINATURA_INVALIDA);
 
         } catch (JwtException ex) {
 
-            unauthorized(response, request, "Falha na autenticação.");
+            unauthorized(response, request, MSG_FALHA_AUTENTICACAO);
         } catch (UsernameNotFoundException ex) {
 
-            unauthorized(response, request, "Token inválido ou usuário inativo.");
+            unauthorized(response, request, MSG_TOKEN_USUARIO_INVALIDO);
         } catch (IllegalArgumentException ex) {
 
-            unauthorized(response, request, "Token inválido.");
+            unauthorized(response, request, MSG_TOKEN_INVALIDO);
         }
     }
 

@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +48,32 @@ class PerfilServiceTest {
     @BeforeEach
     void setUp() {
         perfilService = new PerfilService(repository, recursoService, permissaoService);
+    }
+
+    @Test
+    void deveInicializarRelacionamentosAoBuscarPerfil() {
+        UUID id = UUID.randomUUID();
+        Perfil perfil = mock(Perfil.class);
+        PerfilRecurso associacao = mock(PerfilRecurso.class);
+        Recurso recurso = mock(Recurso.class);
+        List<Permissao> permissoes = mock(List.class);
+        when(repository.findById(id)).thenReturn(Optional.of(perfil));
+        when(perfil.getPerfilRecursos()).thenReturn(List.of(associacao));
+        when(associacao.getRecurso()).thenReturn(recurso);
+        when(associacao.getPermissoes()).thenReturn(permissoes);
+
+        assertSame(perfil, perfilService.findById(id));
+        verify(recurso).getNome();
+        verify(permissoes).size();
+    }
+
+    @Test
+    void deveAceitarPerfilSemAssociacoesAoListar() {
+        Perfil perfil = mock(Perfil.class);
+        when(repository.findAll()).thenReturn(List.of(perfil));
+        when(perfil.getPerfilRecursos()).thenReturn(null);
+
+        assertEquals(List.of(perfil), perfilService.findAll());
     }
 
     @Test

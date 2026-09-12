@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_RECURSO_JA_EXITESNTE;
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
 
 @Service
 public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilService<Perfil> {
@@ -41,6 +41,20 @@ public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilS
         this.repository = repository;
         this.recursoService = recursoService;
         this.permissaoService = permissaoService;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Perfil findById(UUID id) {
+        return inicializarRelacionamentos(super.findById(id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Perfil> findAll() {
+        return super.findAll().stream()
+                .map(this::inicializarRelacionamentos)
+                .toList();
     }
 
     @Override
@@ -146,17 +160,17 @@ public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilS
 
         for (PerfilRecurso associacao : associacoes) {
             if (associacao == null || associacao.getRecurso() == null || associacao.getRecurso().getId() == null) {
-                throw new BusinessException("Recurso do perfil é obrigatório.");
+                throw new BusinessException(MSG_PERFIL_RECURSO_OBRIGATORIO);
             }
 
             UUID recursoId = associacao.getRecurso().getId();
             if (!recursosEncontrados.add(recursoId)) {
-                throw new BusinessException("O mesmo recurso não pode ser informado mais de uma vez no perfil.");
+                throw new BusinessException(MSG_PERFIL_RECURSO_DUPLICADO);
             }
 
             Recurso recurso = recursoService.findById(recursoId);
             if (!Boolean.TRUE.equals(recurso.getAtivo())) {
-                throw new BusinessException("Não é possível associar um recurso inativo ao perfil.");
+                throw new BusinessException(MSG_PERFIL_RECURSO_INATIVO);
             }
 
             List<Permissao> permissoes = carregarPermissoes(associacao.getPermissoes());
@@ -173,15 +187,15 @@ public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilS
 
         for (Permissao recebida : permissoes) {
             if (recebida == null || recebida.getId() == null) {
-                throw new BusinessException("Permissão do recurso é obrigatória.");
+                throw new BusinessException(MSG_PERFIL_PERMISSAO_OBRIGATORIA);
             }
             if (!idsEncontrados.add(recebida.getId())) {
-                throw new BusinessException("A mesma permissão não pode ser informada mais de uma vez para o recurso.");
+                throw new BusinessException(MSG_PERFIL_PERMISSAO_DUPLICADA);
             }
 
             Permissao permissao = permissaoService.findById(recebida.getId());
             if (!Boolean.TRUE.equals(permissao.getAtivo())) {
-                throw new BusinessException("Não é possível associar uma permissão inativa ao perfil.");
+                throw new BusinessException(MSG_PERFIL_PERMISSAO_INATIVA);
             }
             resultado.add(permissao);
         }
@@ -191,7 +205,7 @@ public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilS
 
     private void validarPerfil(Perfil perfil) {
         if (perfil == null || perfil.getNome() == null || perfil.getNome().isBlank()) {
-            throw new BusinessException("Nome do perfil é obrigatório.");
+            throw new BusinessException(MSG_NOME_OBRIGATORIO);
         }
     }
 
@@ -200,7 +214,20 @@ public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilS
     }
 
     private ConflictException conflitoNome(String nome) {
-        return new ConflictException(MSG_RECURSO_JA_EXITESNTE + " com esse nome: " + nome);
+        return new ConflictException(MSG_PERFIL_NOME_EXISTENTE.formatted(nome));
+    }
+
+    private Perfil inicializarRelacionamentos(Perfil perfil) {
+        List<PerfilRecurso> associacoes = perfil.getPerfilRecursos();
+        if (associacoes == null) {
+            return perfil;
+        }
+
+        associacoes.forEach(associacao -> {
+            associacao.getRecurso().getNome();
+            associacao.getPermissoes().size();
+        });
+        return perfil;
     }
 
     private record AssociacaoCarregada(Recurso recurso, List<Permissao> permissoes) {

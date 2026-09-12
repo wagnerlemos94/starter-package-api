@@ -32,6 +32,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Map;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_DADOS_INVALIDOS;
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_OU_SENHA_INVALIDOS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -93,7 +95,7 @@ class SecurityApiIntegrationTest {
 
     @Test
     void loginInvalidoDeveRetornarContrato401() throws Exception {
-        when(authService.login(any())).thenThrow(new UnauthorizedException("Usuário ou senha inválidos"));
+        when(authService.login(any())).thenThrow(new UnauthorizedException(MSG_USUARIO_OU_SENHA_INVALIDOS));
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -102,7 +104,7 @@ class SecurityApiIntegrationTest {
                                 """))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error").value("UNAUTHORIZED"))
-                .andExpect(jsonPath("$.message").value("Usuário ou senha inválidos"))
+                .andExpect(jsonPath("$.message").value(MSG_USUARIO_OU_SENHA_INVALIDOS))
                 .andExpect(jsonPath("$.errorId").isNotEmpty());
     }
 
@@ -114,7 +116,7 @@ class SecurityApiIntegrationTest {
                                 {"cpf":"123","password":""}
                                 """))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Dados inválidos"))
+                .andExpect(jsonPath("$.message").value(MSG_DADOS_INVALIDOS))
                 .andExpect(jsonPath("$.errors[?(@.field == 'cpf')]").exists())
                 .andExpect(jsonPath("$.errors[?(@.field == 'password')]").exists());
     }

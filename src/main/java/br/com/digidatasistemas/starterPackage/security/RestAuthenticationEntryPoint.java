@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_AUTENTICACAO_NECESSARIA;
+
 @Component
 @RequiredArgsConstructor
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -23,6 +25,6 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException, ServletException {
-        errorWriter.write(response, request, HttpStatus.UNAUTHORIZED, "Autenticação necessária.");
+        errorWriter.write(response, request, HttpStatus.UNAUTHORIZED, MSG_AUTENTICACAO_NECESSARIA);
     }
 }

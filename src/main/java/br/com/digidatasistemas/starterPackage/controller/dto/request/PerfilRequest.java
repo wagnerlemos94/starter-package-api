@@ -14,16 +14,18 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
+
 @Getter
 @Setter
 @Component
 public class PerfilRequest implements IRequest<PerfilRequest, Perfil> {
 
     private UUID id;
-    @NotBlank(message = "Nome é obrigatório")
-    @Size(max = 100, message = "Nome deve possuir no máximo 100 caracteres")
+    @NotBlank(message = MSG_NOME_OBRIGATORIO)
+    @Size(max = 100, message = MSG_NOME_MAXIMO_100)
     private String nome;
-    @Size(max = 255, message = "Descrição deve possuir no máximo 255 caracteres")
+    @Size(max = 255, message = MSG_DESCRICAO_MAXIMO_255)
     private String descricao;
     private Boolean ativo = Boolean.TRUE;
 

@@ -1,4 +1,4 @@
-package br.com.digidatasistemas.starterPackage;
+package br.com.digidatasistemas.starterPackage.architecture;
 
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.junit.AnalyzeClasses;

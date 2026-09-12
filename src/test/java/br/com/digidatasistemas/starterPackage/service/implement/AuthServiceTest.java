@@ -18,6 +18,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 import java.util.ArrayList;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_INATIVO;
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_OU_SENHA_INVALIDOS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,7 +68,7 @@ class AuthServiceTest {
                 () -> authService.login(new LoginRequest("00000000535", "errada"))
         );
 
-        assertEquals("Usuário ou senha inválidos", exception.getMessage());
+        assertEquals(MSG_USUARIO_OU_SENHA_INVALIDOS, exception.getMessage());
     }
 
     @Test
@@ -79,7 +81,7 @@ class AuthServiceTest {
                 () -> authService.login(new LoginRequest("00000000535", "senha123"))
         );
 
-        assertEquals("Usuário inativo", exception.getMessage());
+        assertEquals(MSG_USUARIO_INATIVO, exception.getMessage());
     }
 
     private Usuario usuarioAtivo() {

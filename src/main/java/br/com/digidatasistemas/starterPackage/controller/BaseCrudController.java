@@ -12,6 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 import java.util.UUID;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_NAO_AUTENTICADO;
+
 public abstract class BaseCrudController<
         Request,
         Response,
@@ -100,7 +102,7 @@ public abstract class BaseCrudController<
                 !authentication.isAuthenticated()) {
 
             throw new AccessDeniedException(
-                    "Usuário não autenticado."
+                    MSG_USUARIO_NAO_AUTENTICADO
             );
         }
 

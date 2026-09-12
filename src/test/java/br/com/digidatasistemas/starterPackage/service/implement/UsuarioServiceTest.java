@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,12 +53,24 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void deveInicializarAutoridadesAoCarregarUsuarioParaAutenticacao() {
+    void deveInicializarRelacionamentosAoBuscarUsuario() {
         Usuario usuario = mock(Usuario.class);
-        when(usuarioRepository.findByCpf(CPF)).thenReturn(Optional.of(usuario));
+        UUID id = UUID.randomUUID();
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(usuario));
 
-        assertSame(usuario, usuarioService.loadUserByUsername(CPF));
+        assertSame(usuario, usuarioService.findById(id));
         verify(usuario).getAuthorities();
+    }
+
+    @Test
+    void deveInicializarRelacionamentosAoListarUsuarios() {
+        Usuario primeiro = mock(Usuario.class);
+        Usuario segundo = mock(Usuario.class);
+        when(usuarioRepository.findAll()).thenReturn(List.of(primeiro, segundo));
+
+        assertEquals(List.of(primeiro, segundo), usuarioService.findAll());
+        verify(primeiro).getAuthorities();
+        verify(segundo).getAuthorities();
     }
 
     @Test

@@ -9,18 +9,16 @@ import br.com.digidatasistemas.starterPackage.repository.UsuarioRepository;
 import br.com.digidatasistemas.starterPackage.service.IPerfilService;
 import br.com.digidatasistemas.starterPackage.service.IUsuarioService;
 import jakarta.transaction.Transactional;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
 
 @Service
-public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuarioService<Usuario>, UserDetailsService {
+public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuarioService<Usuario> {
 
     private final UsuarioRepository usuarioRepository;
     private final IPerfilService<Perfil> perfilService;
@@ -34,17 +32,17 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
     }
 
     @Override
-    @Transactional
-    public UserDetails loadUserByUsername(String cpf)
-            throws UsernameNotFoundException {
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Usuario findById(UUID id) {
+        return inicializarRelacionamentos(super.findById(id));
+    }
 
-        Usuario usuario = usuarioRepository.findByCpf(cpf)
-                .orElseThrow(
-                        () -> new UsernameNotFoundException(cpf)
-                );
-
-        usuario.getAuthorities();
-        return usuario;
+    @Override
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<Usuario> findAll() {
+        return super.findAll().stream()
+                .map(this::inicializarRelacionamentos)
+                .toList();
     }
 
     @Transactional
@@ -76,7 +74,7 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
 
         if (existsByCpfAndIdNot(usuario.getCpf(), id)) {
             throw new ConflictException(
-                    "O usuário " + usuario.getCpf() + MSG_USUARIO_JA_EXISTENTE
+                    MSG_USUARIO_JA_EXISTENTE.formatted(usuario.getCpf())
             );
         }
 
@@ -118,10 +116,15 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
 
     private void validacaoCriacaoUsuario(Usuario usuario){
         if(existsByCpf(usuario.getCpf())){
-            throw new ConflictException("O usuário " + usuario.getCpf() + MSG_USUARIO_JA_EXISTENTE);
+            throw new ConflictException(MSG_USUARIO_JA_EXISTENTE.formatted(usuario.getCpf()));
         }
         if (usuario.getPassword() == null || usuario.getPassword().isBlank()) {
-            throw new BusinessException("Senha é obrigatória.");
+            throw new BusinessException(MSG_SENHA_OBRIGATORIA);
         }
+    }
+
+    private Usuario inicializarRelacionamentos(Usuario usuario) {
+        usuario.getAuthorities();
+        return usuario;
     }
 }

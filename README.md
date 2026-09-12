@@ -122,7 +122,7 @@ Credenciais inválidas retornam `401 Unauthorized`:
   "timestamp": "2026-08-31T12:00:00",
   "status": 401,
   "error": "UNAUTHORIZED",
-  "message": "Usuário ou senha inválidos",
+  "message": "Usuário ou senha inválidos.",
   "path": "/api/auth/login",
   "details": []
 }
@@ -161,7 +161,7 @@ public class PedidoService {
 
 Os métodos disponíveis são `get()`, `getId()` e `getCpf()`. Quando não existir um `Usuario` autenticado, o componente lança `AccessDeniedException`.
 
-Os relacionamentos JPA são carregados sob demanda (`LAZY`) para evitar que consultas simples tragam automaticamente todo o grafo de perfil, recursos e permissões. No fluxo de autenticação, as autoridades são inicializadas dentro da transação do serviço antes de o usuário ser entregue ao Spring Security.
+Os relacionamentos JPA são carregados sob demanda (`LAZY`) para evitar que consultas simples tragam automaticamente todo o grafo de perfil, recursos e permissões. O Open Session in View está desativado; os services inicializam dentro de transações somente os relacionamentos necessários para autenticação e conversão dos DTOs.
 
 ## Contrato CRUD
 
@@ -461,7 +461,7 @@ Todos os erros da API, inclusive falhas do filtro JWT, seguem o mesmo formato:
   "timestamp": "2026-09-05T12:00:00",
   "status": 400,
   "error": "BAD_REQUEST",
-  "message": "Dados inválidos",
+  "message": "Dados inválidos.",
   "path": "/api/user",
   "errorId": "b38c67d3-1ae1-4765-a1e3-401ef177dcea",
   "errors": [

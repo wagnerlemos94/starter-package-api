@@ -8,9 +8,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_NAO_ENCONTRADO;
+
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsService
+public class SecurityUsuarioDetailsService
         implements IUsuarioDetailsService {
 
     private final UsuarioRepository repository;
@@ -21,7 +23,7 @@ public class CustomUserDetailsService
             String cpf) {
 
         Usuario usuario = repository.findByCpf(cpf)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new UsernameNotFoundException(MSG_USUARIO_NAO_ENCONTRADO));
 
         // Inicializa perfil, recursos e permissões enquanto a sessão JPA está aberta.
         usuario.getAuthorities();
