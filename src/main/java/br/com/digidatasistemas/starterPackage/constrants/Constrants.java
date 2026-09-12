@@ -58,4 +58,5 @@ public abstract class Constrants {
     public static final String MSG_PERFIL_PERMISSAO_INATIVA =
             "Não é possível associar uma permissão inativa ao perfil.";
 
+    public static final String MSG_PERFIL_INATIVO = "Peril inativo";
 }

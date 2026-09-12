@@ -16,7 +16,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 class ArchitectureTest {
 
     @ArchTest
-    static final ArchRule SERVICES_DEVEM_IMPLEMENTAR_INTERFACE =
+    public static final ArchRule SERVICES_DEVEM_IMPLEMENTAR_INTERFACE =
             classes()
                     .that()
                     .resideInAPackage("..service.implement..")
@@ -24,7 +24,7 @@ class ArchitectureTest {
                     .because("services devem possuir um contrato para permitir desacoplamento e testes");
 
     @ArchTest
-    static final ArchRule CONTROLLERS_NAO_DEVEM_DEPENDER_DE_IMPLEMENTACOES_DE_SERVICE =
+    public static final ArchRule CONTROLLERS_NAO_DEVEM_DEPENDER_DE_IMPLEMENTACOES_DE_SERVICE =
             noClasses()
                     .that()
                     .resideInAPackage("..controller..")

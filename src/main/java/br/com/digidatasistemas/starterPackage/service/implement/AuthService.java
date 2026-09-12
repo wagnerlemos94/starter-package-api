@@ -2,6 +2,7 @@ package br.com.digidatasistemas.starterPackage.service.implement;
 
 import br.com.digidatasistemas.starterPackage.controller.dto.request.LoginRequest;
 import br.com.digidatasistemas.starterPackage.controller.dto.response.LoginResponse;
+import br.com.digidatasistemas.starterPackage.exception.BusinessException;
 import br.com.digidatasistemas.starterPackage.exception.UnauthorizedException;
 import br.com.digidatasistemas.starterPackage.model.Usuario;
 import br.com.digidatasistemas.starterPackage.service.IAuthService;
@@ -16,8 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_INATIVO;
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_OU_SENHA_INVALIDOS;
+import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -49,13 +49,21 @@ public class AuthService implements IAuthService {
 
         Map<String, List<String>> resources = new HashMap<>();
 
+        if(!usuario.getPerfil().getAtivo()){
+            throw new BusinessException(MSG_PERFIL_INATIVO);
+        }
+
         usuario.getPerfil().getPerfilRecursos().forEach(profileResource -> {
             String name = profileResource.getRecurso().getChave();
-            List<String> permissions = new ArrayList<>();
-            profileResource.getPermissoes().forEach(permission -> {
-               permissions.add(permission.getChave());
-            });
-            resources.put(name, permissions);
+            if(profileResource.getRecurso().getAtivo()){
+                List<String> permissions = new ArrayList<>();
+                profileResource.getPermissoes().forEach(permission -> {
+                    if(permission.getAtivo()){
+                        permissions.add(permission.getChave());
+                    }
+                });
+                resources.put(name, permissions);
+            }
         });
 
         return new LoginResponse(
