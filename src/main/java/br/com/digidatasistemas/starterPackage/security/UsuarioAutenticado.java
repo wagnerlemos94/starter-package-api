@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_NAO_AUTENTICADO;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.MSG_USUARIO_NAO_AUTENTICADO;
 
 @Component
 public class UsuarioAutenticado {

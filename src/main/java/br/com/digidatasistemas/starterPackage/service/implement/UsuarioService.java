@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.*;
 
 @Service
 public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuarioService<Usuario> {
@@ -98,12 +98,6 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
         }
 
         return usuarioRepository.save(usuarioUpdate);
-    }
-
-
-    @Override
-    public boolean hasPermission(String username, String resource, String permission) {
-        return usuarioRepository.hasPermission(username, resource, permission);
     }
 
     private boolean existsByCpf(String cpf){

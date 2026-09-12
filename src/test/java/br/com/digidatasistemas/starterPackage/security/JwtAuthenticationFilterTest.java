@@ -87,7 +87,7 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void deveContinuarSemTokenParaSecurityDecidirAcesso() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/user");
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/usuario");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         filter.doFilterInternal(request, response, filterChain);
@@ -96,7 +96,7 @@ class JwtAuthenticationFilterTest {
     }
 
     private MockHttpServletRequest requestComToken() {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/user");
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/usuario");
         request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer token");
         return request;
     }

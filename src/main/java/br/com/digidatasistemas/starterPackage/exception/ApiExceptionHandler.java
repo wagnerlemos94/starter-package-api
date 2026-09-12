@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.*;
 
 @Slf4j
 @RestControllerAdvice

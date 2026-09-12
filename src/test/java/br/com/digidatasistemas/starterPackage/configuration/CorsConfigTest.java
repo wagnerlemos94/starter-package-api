@@ -14,7 +14,7 @@ class CorsConfigTest {
         var config = new CorsConfig(
                 "http://localhost:3000, https://app.exemplo.com, http://localhost:3000"
         );
-        var request = new MockHttpServletRequest("OPTIONS", "/user");
+        var request = new MockHttpServletRequest("OPTIONS", "/usuario");
 
         CorsConfiguration cors = config.corsConfigurationSource()
                 .getCorsConfiguration(request);

@@ -15,10 +15,10 @@ O endpoint de login é público. Todos os endpoints de negócio exigem um JWT no
 
 | Domínio | Caminho | Chave de autorização |
 |---|---|---|
-| Usuários | `/user` | `USUARIO` |
-| Perfis | `/profile` | `PERFIL` |
-| Recursos | `/resource` | `RECURSO` |
-| Permissões | `/permission` | `PERMISSOES` |
+| Usuários | `/usuario` | `USUARIO` |
+| Perfis | `/perfil` | `PERFIL` |
+| Recursos | `/recurso` | `RECURSO` |
+| Permissões | `/permissao` | `PERMISSOES` |
 
 Cada chave é combinada com uma operação: `VIEW`, `CREATE`, `UPDATE` ou `DELETE`. Por exemplo, listar usuários exige `USUARIO:VIEW`.
 
@@ -137,7 +137,7 @@ Authorization: Bearer <token>
 ```
 
 ```bash
-curl http://localhost:8085/api/user \
+curl http://localhost:8085/api/usuario \
   -H "Authorization: Bearer SEU_TOKEN"
 ```
 
@@ -179,7 +179,7 @@ Os quatro recursos seguem o mesmo conjunto de rotas, fornecido por `crud-core`:
 
 ## Usuários
 
-Base: `/api/user`
+Base: `/api/usuario`
 
 Payload de criação e atualização:
 
@@ -188,6 +188,7 @@ Payload de criação e atualização:
   "cpf": "00000000000",
   "name": "Maria da Silva",
   "profileId": "a747e317-12b2-4e97-82ac-d583ea704141",
+  "password": "senha-segura",
   "active": true
 }
 ```
@@ -211,11 +212,11 @@ Resposta:
 }
 ```
 
-O DTO público não aceita senha e o campo `password` da resposta é ignorado na serialização. A criação depende de o serviço definir a senha internamente; verifique esse fluxo antes de expor o endpoint em produção.
+Na criação, `password` é obrigatório e deve possuir entre 8 e 72 caracteres. Na atualização, o campo pode ser omitido para manter a senha atual. A API armazena apenas o hash BCrypt e nunca devolve a senha na resposta.
 
 ## Perfis
 
-Base: `/api/profile`
+Base: `/api/perfil`
 
 `perfilRecurso` é um mapa em que a chave é o UUID do recurso e o valor é a lista de UUIDs das permissões concedidas.
 
@@ -267,7 +268,7 @@ A chave do perfil é derivada de `nome.toUpperCase()`.
 
 ## Recursos
 
-Base: `/api/resource`
+Base: `/api/recurso`
 
 ```json
 {
@@ -291,7 +292,7 @@ A chave do recurso é derivada de `nome.toUpperCase()`.
 
 ## Permissões
 
-Base: `/api/permission`
+Base: `/api/permissao`
 
 ```json
 {
@@ -312,7 +313,7 @@ Base: `/api/permission`
 }
 ```
 
-O frontend atual usa apenas `GET /permission` e `GET /permission/{id}`, embora a API exponha o contrato CRUD completo.
+O frontend atual usa apenas `GET /permissao` e `GET /permissao/{id}`, embora a API exponha o contrato CRUD completo.
 
 ## Erros
 
@@ -322,7 +323,7 @@ O frontend atual usa apenas `GET /permission` e `GET /permission/{id}`, embora a
   "status": 403,
   "error": "FORBIDDEN",
   "message": "Usuário não tem permissão para acessar essa funcinalidade.",
-  "path": "/api/user",
+  "path": "/api/usuario",
   "details": ["Usuário não possui a permissão: USUARIO:VIEW"]
 }
 ```
@@ -462,7 +463,7 @@ Todos os erros da API, inclusive falhas do filtro JWT, seguem o mesmo formato:
   "status": 400,
   "error": "BAD_REQUEST",
   "message": "Dados inválidos.",
-  "path": "/api/user",
+  "path": "/api/usuario",
   "errorId": "b38c67d3-1ae1-4765-a1e3-401ef177dcea",
   "errors": [
     { "field": "cpf", "message": "CPF deve conter exatamente 11 números" }
@@ -495,5 +496,5 @@ Somente o endpoint `health` é exposto e seus detalhes internos não são enviad
 - Defina um processo seguro e específico do projeto para criar o primeiro administrador; o starter não fornece usuário padrão.
 - Injete segredos JWT pelo ambiente ou por um cofre de segredos.
 - Configure `CORS_ALLOWED_ORIGINS` somente com os domínios confiáveis de cada ambiente.
-- Confirme o fluxo de definição de senha na criação de usuários.
+- Defina um processo seguro de criação do primeiro administrador em cada projeto.
 - Adicione testes de integração para autenticação, CRUD e autorização por recurso.

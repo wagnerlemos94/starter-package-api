@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_SEM_PERMISSAO;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.MSG_USUARIO_SEM_PERMISSAO;
 
 @Component
 @RequiredArgsConstructor

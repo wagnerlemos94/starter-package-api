@@ -7,6 +7,7 @@ import br.com.digidatasistemas.starterPackage.controller.dto.response.RecursoRes
 import br.com.digidatasistemas.starterPackage.model.Recurso;
 import br.com.digidatasistemas.starterPackage.security.permissao.RecursoPermissao;
 import br.com.digidatasistemas.starterPackage.service.IRecursoService;
+import br.com.digidatasistemas.starterPackage.service.IAutorizacaoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,14 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class RecursoController
         extends BaseCrudController<RecursoRequest, RecursoResponse, Recurso> {
 
-    private final IRecursoService<Recurso> service;
-
     public RecursoController(
             IRecursoService<Recurso> service,
             IRequest<RecursoRequest, Recurso> request,
-            IResponse<Recurso, RecursoResponse> response) {
+            IResponse<Recurso, RecursoResponse> response,
+            IAutorizacaoService autorizacaoService) {
 
-        super(service, request, response);
-        this.service = service;
+        super(service, request, response, autorizacaoService);
     }
 }

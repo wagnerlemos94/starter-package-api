@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.*;
 
 @Service
 @RequiredArgsConstructor

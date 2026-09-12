@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_NAO_ENCONTRADO;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.MSG_USUARIO_NAO_ENCONTRADO;
 
 @Service
 @RequiredArgsConstructor

@@ -3,7 +3,7 @@ package br.com.digidatasistemas.starterPackage.controller.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.*;
 
 public record LoginRequest(
         @NotBlank(message = MSG_CPF_OBRIGATORIO)

@@ -12,10 +12,7 @@ import java.util.UUID;
 public class RecursoService extends CrudService<Recurso, UUID>
         implements IRecursoService<Recurso> {
 
-    private final RecursoRepository repository;
-
     public RecursoService(RecursoRepository repository) {
         super(repository);
-        this.repository = repository;
     }
 }

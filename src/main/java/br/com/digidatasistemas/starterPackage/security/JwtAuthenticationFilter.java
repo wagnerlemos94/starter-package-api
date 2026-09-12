@@ -23,7 +23,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.*;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.*;
 
 @Component
 @RequiredArgsConstructor

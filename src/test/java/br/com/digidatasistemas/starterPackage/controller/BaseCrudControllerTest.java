@@ -4,6 +4,7 @@ import br.com.digidata.crud.controller.dto.request.IRequest;
 import br.com.digidata.crud.controller.dto.response.IResponse;
 import br.com.digidata.crud.service.ICrudService;
 import br.com.digidatasistemas.starterPackage.security.permissao.RecursoPermissao;
+import br.com.digidatasistemas.starterPackage.service.IAutorizacaoService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.AccessDeniedException;
@@ -61,7 +62,7 @@ class BaseCrudControllerTest {
     void deveFalharQuandoControllerNaoDeclaraRecurso() {
         assertThatThrownBy(() -> new ControllerSemRecurso().verificar("VIEW"))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("não possui @ResourcePermission");
+                .hasMessageContaining("não possui @RecursoPermissao");
     }
 
     private void autenticar(boolean autenticado, String... autoridades) {
@@ -83,7 +84,16 @@ class BaseCrudControllerTest {
 
         @SuppressWarnings("unchecked")
         private ControllerBaseTeste() {
-            super(mock(ICrudService.class), mock(IRequest.class), mock(IResponse.class));
+            super(mock(ICrudService.class), mock(IRequest.class), mock(IResponse.class),
+                    autorizacaoService());
+        }
+
+        private static IAutorizacaoService autorizacaoService() {
+            return (authentication, resource, permission) ->
+                    authentication != null
+                            && authentication.isAuthenticated()
+                            && authentication.getAuthorities().stream()
+                            .anyMatch(authority -> authority.getAuthority().equals(resource + ":" + permission));
         }
 
         void verificar(String permissao) {

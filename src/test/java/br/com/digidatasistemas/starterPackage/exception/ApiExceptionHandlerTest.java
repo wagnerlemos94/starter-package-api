@@ -13,8 +13,8 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_DADOS_INVALIDOS;
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_ERRO_INTERNO;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.MSG_DADOS_INVALIDOS;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.MSG_ERRO_INTERNO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -32,7 +32,7 @@ class ApiExceptionHandlerTest {
     @BeforeEach
     void setUp() {
         handler = new ApiExceptionHandler();
-        when(request.getRequestURI()).thenReturn("/api/user");
+        when(request.getRequestURI()).thenReturn("/api/usuario");
     }
 
     @Test

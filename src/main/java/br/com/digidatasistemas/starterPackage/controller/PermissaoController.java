@@ -7,6 +7,7 @@ import br.com.digidatasistemas.starterPackage.controller.dto.response.PermissaoR
 import br.com.digidatasistemas.starterPackage.model.Permissao;
 import br.com.digidatasistemas.starterPackage.security.permissao.RecursoPermissao;
 import br.com.digidatasistemas.starterPackage.service.IPermissaoService;
+import br.com.digidatasistemas.starterPackage.service.IAutorizacaoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,14 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class PermissaoController
         extends BaseCrudController<PermissaoRequest, PermissaoResponse, Permissao> {
 
-    private final IPermissaoService<Permissao> service;
-
     public PermissaoController(
             IPermissaoService<Permissao> service,
             IRequest<PermissaoRequest, Permissao> request,
-            IResponse<Permissao, PermissaoResponse> response) {
+            IResponse<Permissao, PermissaoResponse> response,
+            IAutorizacaoService autorizacaoService) {
 
-        super(service, request, response);
-        this.service = service;
+        super(service, request, response, autorizacaoService);
     }
 }

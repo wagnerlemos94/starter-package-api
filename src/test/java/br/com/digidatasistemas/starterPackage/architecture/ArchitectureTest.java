@@ -1,30 +1,31 @@
 package br.com.digidatasistemas.starterPackage.architecture;
 
 import com.tngtech.archunit.core.domain.JavaClass;
-import com.tngtech.archunit.junit.AnalyzeClasses;
-import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
+import org.junit.jupiter.api.Test;
 import org.springframework.stereotype.Service;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
-@AnalyzeClasses(packages = "br.com.digidatasistemas.starterPackage")
-class ArchitectureTest {
+public class ArchitectureTest {
 
-    @ArchTest
-    public static final ArchRule SERVICES_DEVEM_IMPLEMENTAR_INTERFACE =
+    private static final JavaClasses CLASSES = new ClassFileImporter()
+            .importPackages("br.com.digidatasistemas.starterPackage");
+
+    private static final ArchRule SERVICES_DEVEM_IMPLEMENTAR_INTERFACE =
             classes()
                     .that()
                     .resideInAPackage("..service.implement..")
                     .should(implementarAlgumaInterface())
                     .because("services devem possuir um contrato para permitir desacoplamento e testes");
 
-    @ArchTest
-    public static final ArchRule CONTROLLERS_NAO_DEVEM_DEPENDER_DE_IMPLEMENTACOES_DE_SERVICE =
+    private static final ArchRule CONTROLLERS_NAO_DEVEM_DEPENDER_DE_IMPLEMENTACOES_DE_SERVICE =
             noClasses()
                     .that()
                     .resideInAPackage("..controller..")
@@ -32,6 +33,16 @@ class ArchitectureTest {
                     .dependOnClassesThat()
                     .resideInAPackage("..service.implement..")
                     .because("controllers devem receber interfaces de service, nunca implementacoes concretas");
+
+    @Test
+    void servicesDevemImplementarInterface() {
+        SERVICES_DEVEM_IMPLEMENTAR_INTERFACE.check(CLASSES);
+    }
+
+    @Test
+    void controllersNaoDevemDependerDeImplementacoesDeService() {
+        CONTROLLERS_NAO_DEVEM_DEPENDER_DE_IMPLEMENTACOES_DE_SERVICE.check(CLASSES);
+    }
 
     private static ArchCondition<JavaClass> implementarAlgumaInterface() {
         return new ArchCondition<>("implementar pelo menos uma interface") {

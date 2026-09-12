@@ -27,7 +27,7 @@ class SecurityErrorHandlersTest {
 
     @Test
     void deveRetornarContratoPadraoQuandoNaoAutenticado() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/user");
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/usuario");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         authenticationEntryPoint.commence(request, response, new BadCredentialsException("interno"));
@@ -39,7 +39,7 @@ class SecurityErrorHandlersTest {
 
     @Test
     void deveRetornarContratoPadraoQuandoSemPermissao() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/user");
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/usuario");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         accessDeniedHandler.handle(request, response, new AccessDeniedException("interno"));

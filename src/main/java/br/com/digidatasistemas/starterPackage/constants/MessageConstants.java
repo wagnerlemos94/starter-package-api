@@ -1,8 +1,8 @@
-package br.com.digidatasistemas.starterPackage.constrants;
+package br.com.digidatasistemas.starterPackage.constants;
 
-public abstract class Constrants {
+public final class MessageConstants {
 
-    private Constrants() {
+    private MessageConstants() {
     }
 
     public static final String MSG_DADOS_INVALIDOS = "Dados inválidos.";
@@ -14,6 +14,8 @@ public abstract class Constrants {
     public static final String MSG_USUARIO_NAO_AUTENTICADO = "Usuário não autenticado.";
     public static final String MSG_USUARIO_SEM_PERMISSAO =
             "Usuário não tem permissão para acessar esta funcionalidade.";
+    public static final String MSG_USUARIO_SEM_PERMISSAO_ESPECIFICA =
+            "Usuário não possui a permissão: %s";
     public static final String MSG_USUARIO_OU_SENHA_INVALIDOS = "Usuário ou senha inválidos.";
     public static final String MSG_USUARIO_INATIVO = "Usuário inativo.";
     public static final String MSG_USUARIO_NAO_ENCONTRADO = "Usuário não encontrado.";
@@ -58,5 +60,5 @@ public abstract class Constrants {
     public static final String MSG_PERFIL_PERMISSAO_INATIVA =
             "Não é possível associar uma permissão inativa ao perfil.";
 
-    public static final String MSG_PERFIL_INATIVO = "Peril inativo";
+    public static final String MSG_PERFIL_INATIVO = "Perfil inativo.";
 }

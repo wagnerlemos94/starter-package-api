@@ -32,8 +32,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Map;
 
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_DADOS_INVALIDOS;
-import static br.com.digidatasistemas.starterPackage.constrants.Constrants.MSG_USUARIO_OU_SENHA_INVALIDOS;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.MSG_DADOS_INVALIDOS;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.MSG_USUARIO_OU_SENHA_INVALIDOS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

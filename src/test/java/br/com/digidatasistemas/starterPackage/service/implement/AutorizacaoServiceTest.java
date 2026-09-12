@@ -1,7 +1,5 @@
 package br.com.digidatasistemas.starterPackage.service.implement;
 
-import br.com.digidatasistemas.starterPackage.repository.PermissaoRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,16 +7,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
-class PermissaoServiceTest {
+class AutorizacaoServiceTest {
 
-    private PermissaoService service;
-
-    @BeforeEach
-    void setUp() {
-        service = new PermissaoService(mock(PermissaoRepository.class));
-    }
+    private final AutorizacaoService service = new AutorizacaoService();
 
     @Test
     void deveAutorizarQuandoUsuarioPossuiAutoridadeExata() {
