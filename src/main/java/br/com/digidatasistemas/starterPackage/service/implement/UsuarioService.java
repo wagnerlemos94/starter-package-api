@@ -31,20 +31,6 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public Usuario findById(UUID id) {
-        return inicializarRelacionamentos(super.findById(id));
-    }
-
-    @Override
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<Usuario> findAll() {
-        return super.findAll().stream()
-                .map(this::inicializarRelacionamentos)
-                .toList();
-    }
-
     @Transactional
     @Override
     public Usuario create(Usuario usuario) {

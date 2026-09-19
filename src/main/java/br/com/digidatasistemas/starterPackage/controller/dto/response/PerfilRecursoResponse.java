@@ -34,11 +34,7 @@ public class PerfilRecursoResponse implements IResponse<PerfilRecurso, PerfilRec
 
     @Override
     public PerfilRecursoResponse to(PerfilRecurso perfilRecurso) {
-        return PerfilRecursoResponse.builder()
-                .id(perfilRecurso.getId())
-                .recursoId(perfilRecurso.getRecurso().getId())
-                .recurso(perfilRecurso.getRecurso().getNome())
-                .build();
+        return new PerfilRecursoResponse(perfilRecurso);
     }
 
     @Override

@@ -34,7 +34,6 @@ public class RecursoRequest implements IRequest<RecursoRequest, Recurso> {
         return Recurso.builder()
                 .id(request.getId())
                 .nome(request.getNome())
-                .chave(request.getNome().toUpperCase())
                 .descricao(request.getDescricao())
                 .ativo(request.getAtivo())
                 .build();

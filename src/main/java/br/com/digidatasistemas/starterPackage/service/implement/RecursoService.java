@@ -15,4 +15,10 @@ public class RecursoService extends CrudService<Recurso, UUID>
     public RecursoService(RecursoRepository repository) {
         super(repository);
     }
+
+    @Override
+    public Recurso create(Recurso recurso) {
+        recurso.setChave(recurso.getNome().toUpperCase().trim());
+        return super.create(recurso);
+    }
 }
