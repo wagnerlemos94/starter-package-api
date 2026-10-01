@@ -93,10 +93,10 @@ public class ApiExceptionHandler {
         String errorId = UUID.randomUUID().toString();
         HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
         String message = MSG_ERRO_INTERNO;
-        if(((NoResourceFoundException) ex).getBody().getStatus() == 404){
+        if (ex instanceof NoResourceFoundException) {
             statusCode = HttpStatus.NOT_FOUND;
             message = MSG_ERRO_NAO_ENCONTRADO;
-        }else{
+        } else {
             log.error("Erro interno não tratado. errorId={}", errorId, ex);
         }
         return response(

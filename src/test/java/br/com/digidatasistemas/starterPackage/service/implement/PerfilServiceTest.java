@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,10 +72,14 @@ class PerfilServiceTest {
     @Test
     void deveAceitarPerfilSemAssociacoesAoListar() {
         Perfil perfil = mock(Perfil.class);
-        when(repository.findAll()).thenReturn(List.of(perfil));
+        var pageable = PageRequest.of(1, 20);
+        var pagina = new PageImpl<>(List.of(perfil), pageable, 21);
+        when(repository.findAll(pageable)).thenReturn(pagina);
         when(perfil.getPerfilRecursos()).thenReturn(null);
 
-        assertEquals(List.of(perfil), perfilService.findAll());
+        assertSame(pagina, perfilService.findAll(pageable));
+        assertEquals(21, pagina.getTotalElements());
+        verify(perfil).getPerfilRecursos();
     }
 
     @Test
@@ -126,7 +132,7 @@ class PerfilServiceTest {
     }
 
     @Test
-    void deveAtualizarChaveEReconciliarRecursos() {
+    void devePreservarChaveAoAtualizarNomeEReconciliarRecursos() {
         UUID perfilId = UUID.randomUUID();
         UUID recursoMantidoId = UUID.randomUUID();
         UUID recursoRemovidoId = UUID.randomUUID();
@@ -160,7 +166,8 @@ class PerfilServiceTest {
 
         Perfil resultado = perfilService.update(perfilId, alteracoes);
 
-        assertEquals("NOVO NOME", resultado.getChave());
+        assertEquals("Novo nome", resultado.getNome());
+        assertEquals("ANTERIOR", resultado.getChave());
         assertTrue(resultado.getAtivo());
         assertEquals(2, resultado.getPerfilRecursos().size());
         assertTrue(resultado.getPerfilRecursos().contains(mantido));

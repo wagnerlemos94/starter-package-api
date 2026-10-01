@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -66,9 +68,12 @@ class UsuarioServiceTest {
     void deveInicializarRelacionamentosAoListarUsuarios() {
         Usuario primeiro = mock(Usuario.class);
         Usuario segundo = mock(Usuario.class);
-        when(usuarioRepository.findAll()).thenReturn(List.of(primeiro, segundo));
+        var pageable = PageRequest.of(1, 20);
+        var pagina = new PageImpl<>(List.of(primeiro, segundo), pageable, 42);
+        when(usuarioRepository.findAll(pageable)).thenReturn(pagina);
 
-        assertEquals(List.of(primeiro, segundo), usuarioService.findAll());
+        assertSame(pagina, usuarioService.findAll(pageable));
+        assertEquals(42, pagina.getTotalElements());
         verify(primeiro).getAuthorities();
         verify(segundo).getAuthorities();
     }

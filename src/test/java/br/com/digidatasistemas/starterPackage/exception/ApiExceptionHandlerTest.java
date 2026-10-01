@@ -8,13 +8,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.MSG_DADOS_INVALIDOS;
 import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.MSG_ERRO_INTERNO;
+import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.MSG_ERRO_NAO_ENCONTRADO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -71,6 +74,17 @@ class ApiExceptionHandlerTest {
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertFalse(response.getBody().message().contains("usuario_cpf_key"));
+    }
+
+    @Test
+    void deveRetornarNotFoundParaRotaInexistente() {
+        ResponseEntity<ErrorResponse> response = handler.handleGeneric(
+                new NoResourceFoundException(HttpMethod.GET, "/api/inexistente"), request);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(MSG_ERRO_NAO_ENCONTRADO, response.getBody().message());
+        assertNotNull(response.getBody().errorId());
+        assertTrue(response.getBody().errors().isEmpty());
     }
 
     @Test
