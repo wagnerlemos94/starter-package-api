@@ -19,6 +19,7 @@
 - A chave do perfil é gerada na criação e preservada quando seu nome é atualizado. Recursos e permissões também restringem os campos atualizáveis por `updatableProperties()`.
 - Na associação de recursos e permissões a perfis, carregue as entidades pelo banco e preserve as validações de existência, atividade e duplicidade.
 - Senhas são armazenadas com BCrypt e nunca retornadas. Na atualização de usuário, senha ausente mantém a senha atual.
+- `GET/PUT /usuario/me` usam o ID de `UsuarioAutenticado` e permitem editar somente nome e senha, sem exigir permissões administrativas. Troca da própria senha exige validar a senha atual; preserve CPF, perfil e status.
 - Preserve o contrato de erros de `ErrorResponse`, incluindo `errorId` e `errors` por campo. Exceções genéricas não devem expor informações internas.
 - Confira o tipo antes de tratar uma exceção específica; não faça casts de `Exception` sem verificação.
 - Preserve JWT e autorização por recurso/operação: `USUARIO`, `PERFIL`, `RECURSO`, `PERMISSOES` e `VIEW`, `CREATE`, `UPDATE`, `DELETE`.

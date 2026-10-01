@@ -109,6 +109,20 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
         return Set.of("cpf", "name", "password", "perfil", "active");
     }
 
+    @Transactional
+    @Override
+    public Usuario updateCurrent(UUID id, String name, String password, String currentPassword) {
+        Usuario usuario = super.findById(id);
+        if (password != null) {
+            if (currentPassword == null || !passwordEncoder.matches(currentPassword, usuario.getPassword())) {
+                throw new BusinessException(MSG_SENHA_ATUAL_INVALIDA);
+            }
+            usuario.setPassword(passwordEncoder.encode(password));
+        }
+        usuario.setName(name.trim());
+        return inicializarRelacionamentos(usuarioRepository.save(usuario));
+    }
+
     private boolean existsByCpf(String cpf){
         return usuarioRepository.existsByCpf(cpf);
     }

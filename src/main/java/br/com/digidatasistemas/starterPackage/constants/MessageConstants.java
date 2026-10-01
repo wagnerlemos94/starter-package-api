@@ -32,6 +32,7 @@ public final class MessageConstants {
 
     public static final String MSG_NOME_OBRIGATORIO = "Nome é obrigatório.";
     public static final String MSG_SENHA_OBRIGATORIA = "Senha é obrigatória.";
+    public static final String MSG_SENHA_ATUAL_INVALIDA = "Senha atual inválida.";
     public static final String MSG_PERFIL_OBRIGATORIO = "Perfil é obrigatório.";
     public static final String MSG_ATIVO_OBRIGATORIO = "Ativo é obrigatório.";
     public static final String MSG_CHAVE_OBRIGATORIA = "Chave é obrigatória.";

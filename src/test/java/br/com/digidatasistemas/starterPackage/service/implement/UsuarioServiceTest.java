@@ -79,6 +79,65 @@ class UsuarioServiceTest {
     }
 
     @Test
+    void deveAtualizarProprioNomeSemAlterarCpfPerfilStatusOuSenha() {
+        UUID id = UUID.randomUUID();
+        Usuario existente = usuarioExistente(id, "hash-atual", true);
+        Perfil perfilOriginal = existente.getPerfil();
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(existente));
+        when(usuarioRepository.save(existente)).thenReturn(existente);
+
+        Usuario resultado = usuarioService.updateCurrent(id, "  Novo nome  ", null, null);
+
+        assertEquals("Novo nome", resultado.getName());
+        assertEquals(CPF, resultado.getCpf());
+        assertEquals("hash-atual", resultado.getPassword());
+        assertSame(perfilOriginal, resultado.getPerfil());
+        assertTrue(resultado.getActive());
+        verify(passwordEncoder, never()).encode(any());
+    }
+
+    @Test
+    void deveAlterarPropriaSenhaSomenteAposValidarSenhaAtual() {
+        UUID id = UUID.randomUUID();
+        Usuario existente = usuarioExistente(id, "hash-atual", true);
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(existente));
+        when(passwordEncoder.matches("senha-atual", "hash-atual")).thenReturn(true);
+        when(passwordEncoder.encode(SENHA)).thenReturn(SENHA_CRIPTOGRAFADA);
+        when(usuarioRepository.save(existente)).thenReturn(existente);
+
+        Usuario resultado = usuarioService.updateCurrent(id, "Novo nome", SENHA, "senha-atual");
+
+        assertEquals(SENHA_CRIPTOGRAFADA, resultado.getPassword());
+        assertEquals("Novo nome", resultado.getName());
+    }
+
+    @Test
+    void deveRejeitarTrocaDeSenhaComSenhaAtualIncorretaSemModificarUsuario() {
+        UUID id = UUID.randomUUID();
+        Usuario existente = usuarioExistente(id, "hash-atual", true);
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(existente));
+        when(passwordEncoder.matches("incorreta", "hash-atual")).thenReturn(false);
+
+        assertThrows(BusinessException.class,
+                () -> usuarioService.updateCurrent(id, "Novo nome", SENHA, "incorreta"));
+
+        assertEquals("Nome anterior", existente.getName());
+        assertEquals("hash-atual", existente.getPassword());
+        verify(usuarioRepository, never()).save(any());
+        verify(passwordEncoder, never()).encode(any());
+    }
+
+    @Test
+    void deveRejeitarTrocaDeSenhaSemSenhaAtual() {
+        UUID id = UUID.randomUUID();
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(usuarioExistente(id, "hash-atual", true)));
+
+        assertThrows(BusinessException.class,
+                () -> usuarioService.updateCurrent(id, "Novo nome", SENHA, null));
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
     void deveCriarUsuarioComSenhaCriptografadaEPerfilCarregado() {
         Perfil perfilInformado = perfil(UUID.randomUUID());
         Perfil perfilCarregado = perfil(perfilInformado.getId());

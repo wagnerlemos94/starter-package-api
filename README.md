@@ -229,6 +229,22 @@ Resposta:
 
 Na criação, `password` é obrigatório e deve possuir entre 8 e 72 caracteres. Na atualização, o campo pode ser omitido para manter a senha atual. A API armazena apenas o hash BCrypt e nunca devolve a senha na resposta.
 
+## Edição da própria conta
+
+`GET /api/usuario/me` consulta a conta autenticada e `PUT /api/usuario/me` atualiza seu nome e, opcionalmente, sua senha. Ambos exigem JWT válido, sem exigir permissões administrativas `USUARIO:VIEW` ou `USUARIO:UPDATE`. O ID da conta vem de `UsuarioAutenticado`, nunca do payload ou da URL.
+
+```json
+{
+  "name": "Maria da Silva",
+  "password": "nova-senha-segura",
+  "currentPassword": "senha-atual"
+}
+```
+
+Para atualizar somente o nome, omita `password` e `currentPassword`. Para trocar a senha, informe uma nova senha entre 8 e 72 caracteres e a senha atual correta; senha atual inválida retorna `400`. A resposta usa o mesmo DTO de usuário, sem senhas.
+
+CPF, perfil e status não são alteráveis por esses endpoints. A edição administrativa por UUID continua sujeita às permissões CRUD existentes.
+
 ## Perfis
 
 Base: `/api/perfil`
