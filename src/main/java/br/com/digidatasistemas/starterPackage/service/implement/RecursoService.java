@@ -6,6 +6,7 @@ import br.com.digidatasistemas.starterPackage.repository.RecursoRepository;
 import br.com.digidatasistemas.starterPackage.service.IRecursoService;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -20,5 +21,10 @@ public class RecursoService extends CrudService<Recurso, UUID>
     public Recurso create(Recurso recurso) {
         recurso.setChave(recurso.getNome().toUpperCase().trim());
         return super.create(recurso);
+    }
+
+    @Override
+    protected Set<String> updatableProperties() {
+        return Set.of("nome", "descricao", "ativo");
     }
 }

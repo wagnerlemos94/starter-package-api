@@ -11,6 +11,8 @@ import br.com.digidatasistemas.starterPackage.repository.PerfilRepository;
 import br.com.digidatasistemas.starterPackage.service.IPerfilService;
 import br.com.digidatasistemas.starterPackage.service.IPermissaoService;
 import br.com.digidatasistemas.starterPackage.service.IRecursoService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,10 +53,10 @@ public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilS
 
     @Override
     @Transactional(readOnly = true)
-    public List<Perfil> findAll() {
-        return super.findAll().stream()
-                .map(this::inicializarRelacionamentos)
-                .toList();
+    public Page<Perfil> findAll(Pageable pageable) {
+        Page<Perfil> perfils = super.findAll(pageable);
+        perfils.forEach(this::inicializarRelacionamentos);
+        return perfils;
     }
 
     @Override
@@ -87,7 +89,6 @@ public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilS
         }
 
         perfilSalvo.setNome(nome);
-        perfilSalvo.setChave(gerarChave(nome));
         perfilSalvo.setDescricao(perfil.getDescricao());
         if (perfil.getAtivo() != null) {
             perfilSalvo.setAtivo(perfil.getAtivo());
@@ -95,6 +96,11 @@ public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilS
 
         atualizarAssociacoes(perfilSalvo, perfil.getPerfilRecursos());
         return repository.save(perfilSalvo);
+    }
+
+    @Override
+    protected Set<String> updatableProperties() {
+        return Set.of("nome", "descricao", "ativo", "perfilRecursos");
     }
 
     @Override

@@ -11,6 +11,7 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -90,11 +91,17 @@ public class ApiExceptionHandler {
             HttpServletRequest request
     ) {
         String errorId = UUID.randomUUID().toString();
-        log.error("Erro interno não tratado. errorId={}", errorId, ex);
-
+        HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+        String message = MSG_ERRO_INTERNO;
+        if(((NoResourceFoundException) ex).getBody().getStatus() == 404){
+            statusCode = HttpStatus.NOT_FOUND;
+            message = MSG_ERRO_NAO_ENCONTRADO;
+        }else{
+            log.error("Erro interno não tratado. errorId={}", errorId, ex);
+        }
         return response(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                MSG_ERRO_INTERNO,
+                statusCode,
+                message,
                 request,
                 errorId,
                 List.of()

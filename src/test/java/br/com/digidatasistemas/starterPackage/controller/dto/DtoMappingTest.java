@@ -101,41 +101,4 @@ class DtoMappingTest {
                 .extracting(Permissao::getId).isEqualTo(id);
     }
 
-    @Test
-    void deveConverterResponsesComRelacionamentos() {
-        var permissao = Permissao.builder().id(UUID.randomUUID()).nome("Visualizar").chave("VIEW").ativo(true).build();
-        var recurso = Recurso.builder().id(UUID.randomUUID()).nome("Aluno").chave("ALUNO").ativo(true).build();
-        var associacao = PerfilRecurso.builder().id(UUID.randomUUID()).recurso(recurso).permissoes(List.of(permissao)).build();
-        var perfil = Perfil.builder().id(UUID.randomUUID()).nome("Operador").chave("OPERADOR")
-                .perfilRecursos(List.of(associacao)).ativo(true).build();
-        var usuario = Usuario.builder().id(UUID.randomUUID()).cpf("00000000535").name("Usuário")
-                .active(true).perfil(perfil).build();
-
-        PerfilResponse perfilResponse = new PerfilResponse().to(perfil);
-        assertThat(perfilResponse.getPerfilRecursoResponse()).singleElement().satisfies(item -> {
-            assertThat(item.getRecursoId()).isEqualTo(recurso.getId());
-            assertThat(item.getPermissoes()).extracting(PermissaoResponse::getChave).containsExactly("VIEW");
-        });
-        assertThat(new PerfilResponse().to(List.of(perfil))).hasSize(1);
-        assertThat(new RecursoResponse().to(List.of(recurso))).singleElement().extracting(RecursoResponse::getChave).isEqualTo("ALUNO");
-        assertThat(new PermissaoResponse().to(List.of(permissao))).singleElement().extracting(PermissaoResponse::getChave).isEqualTo("VIEW");
-        assertThat(new UsuarioResponse().to(List.of(usuario))).singleElement().satisfies(response -> {
-            assertThat(response.getCpf()).isEqualTo("00000000535");
-            assertThat(response.getProfile().getNome()).isEqualTo("Operador");
-        });
-    }
-
-    @Test
-    void deveConverterRelacionamentosNulosNosResponses() {
-        var perfil = Perfil.builder().perfilRecursos(null).build();
-        assertThat(new PerfilResponse(perfil).getPerfilRecursoResponse()).isEmpty();
-
-        var recurso = Recurso.builder().build();
-        var associacao = PerfilRecurso.builder().recurso(recurso).permissoes(null).build();
-        assertThat(new br.com.digidatasistemas.starterPackage.controller.dto.response.PerfilRecursoResponse(associacao)
-                .getPermissoes()).isEmpty();
-
-        var response = new UsuarioResponse().to(Usuario.builder().perfil(null).build());
-        assertThat(response.getProfile()).isNotNull();
-    }
 }

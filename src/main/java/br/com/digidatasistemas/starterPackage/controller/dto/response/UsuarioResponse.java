@@ -20,17 +20,18 @@ public class UsuarioResponse implements IResponse<Usuario, UsuarioResponse> {
     private String cpf;
     private String name;
     private Boolean active;
-    private PerfilResponse profile;
+    private String profile;
+    private UUID profileId;
 
     @Override
     public UsuarioResponse to(Usuario usuario) {
-        PerfilResponse profile =  usuario.getPerfil() != null ? new PerfilResponse(usuario.getPerfil()) : new PerfilResponse();
         return UsuarioResponse.builder()
                 .id(usuario.getId())
                 .cpf(usuario.getCpf())
                 .name(usuario.getName())
                 .active(usuario.getActive())
-                .profile(profile)
+                .profile(usuario.getPerfil().getNome())
+                .profileId(usuario.getPerfil().getId())
                 .build();
     }
 

@@ -7,6 +7,7 @@ public final class MessageConstants {
 
     public static final String MSG_DADOS_INVALIDOS = "Dados inválidos.";
     public static final String MSG_ERRO_INTERNO = "Erro interno no servidor.";
+    public static final String MSG_ERRO_NAO_ENCONTRADO = "Recurso não encontrado.";
     public static final String MSG_CONFLITO_INTEGRIDADE =
             "Não foi possível concluir a operação porque o recurso já existe ou está em uso.";
 

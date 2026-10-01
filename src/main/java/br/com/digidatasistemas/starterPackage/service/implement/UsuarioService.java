@@ -9,10 +9,13 @@ import br.com.digidatasistemas.starterPackage.repository.UsuarioRepository;
 import br.com.digidatasistemas.starterPackage.service.IPerfilService;
 import br.com.digidatasistemas.starterPackage.service.IUsuarioService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static br.com.digidatasistemas.starterPackage.constants.MessageConstants.*;
@@ -29,6 +32,21 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
         this.usuarioRepository = usuarioRepository;
         this.perfilService = perfilService;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Transactional
+    @Override
+    public Page<Usuario> findAll(Pageable pageable) {
+        Page<Usuario> usuarios = super.findAll(pageable);
+        usuarios.forEach(this::inicializarRelacionamentos);
+        return usuarios;
+    }
+
+    @Transactional
+    @Override
+    public Usuario findById(UUID id) {
+        Usuario usuario = super.findById(id);
+        return inicializarRelacionamentos(usuario);
     }
 
     @Transactional
@@ -84,6 +102,11 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
         }
 
         return usuarioRepository.save(usuarioUpdate);
+    }
+
+    @Override
+    protected Set<String> updatableProperties() {
+        return Set.of("cpf", "name", "password", "perfil", "active");
     }
 
     private boolean existsByCpf(String cpf){

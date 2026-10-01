@@ -27,7 +27,7 @@ Cada chave é combinada com uma operação: `VIEW`, `CREATE`, `UPDATE` ou `DELET
 - Java 21
 - PostgreSQL
 - Maven, ou o Maven Wrapper incluído
-- Credenciais do GitHub Packages com acesso a `br.com.digidata:crud-core:1.2.5`
+- Credenciais do GitHub Packages com acesso a `br.com.digidata:crud-core:2.0.0`
 
 Configure as credenciais usadas por `settings.xml`:
 
@@ -169,13 +169,34 @@ Os quatro recursos seguem o mesmo conjunto de rotas, fornecido por `crud-core`:
 
 | Método | Caminho | Ação | Permissão | Resposta esperada |
 |---|---|---|---|---|
-| `GET` | `/{recurso}` | Lista registros | `VIEW` | `200` com array |
+| `GET` | `/{recurso}` | Lista registros | `VIEW` | `200` com página de registros |
 | `GET` | `/{recurso}/{id}` | Busca por UUID | `VIEW` | `200` com objeto |
 | `POST` | `/{recurso}` | Cria registro | `CREATE` | Objeto criado |
 | `PUT` | `/{recurso}/{id}` | Atualiza registro | `UPDATE` | Objeto atualizado |
 | `DELETE` | `/{recurso}/{id}` | Exclui registro | `DELETE` | Corpo vazio ou resposta da biblioteca |
 
 `{id}` é sempre um UUID. Um registro inexistente produz `404`; falta de permissão produz `403`.
+
+## Paginação das listagens
+
+As consultas `GET /usuario`, `/perfil`, `/recurso` e `/permissao` retornam `PageResponse`, fornecido por `crud-core` 2.0.0. A página começa em zero; envie `page` e `size` na query string:
+
+```http
+GET /api/usuario?page=0&size=20
+Authorization: Bearer <token>
+```
+
+```json
+{
+  "content": [],
+  "page": 0,
+  "size": 20,
+  "totalElements": 0,
+  "totalPages": 0
+}
+```
+
+`content` contém os DTOs da página; `totalElements` e `totalPages` descrevem a consulta completa. O tamanho máximo aceito pela biblioteca é 100 registros. A listagem verifica a permissão `VIEW` em `BaseCrudController.list(Pageable)` antes de consultar os dados. Os services de usuários e perfis inicializam os relacionamentos necessários dentro da transação para converter os DTOs.
 
 ## Usuários
 
@@ -201,14 +222,8 @@ Resposta:
   "cpf": "00000000000",
   "name": "Maria da Silva",
   "active": true,
-  "profile": {
-    "id": "a747e317-12b2-4e97-82ac-d583ea704141",
-    "nome": "ADMIN",
-    "chave": "ADMIN",
-    "descricao": "Perfil de administrador do sistema",
-    "ativo": true,
-    "perfilRecursoResponse": []
-  }
+  "profile": "ADMIN",
+  "profileId": "a747e317-12b2-4e97-82ac-d583ea704141"
 }
 ```
 
@@ -220,7 +235,7 @@ Base: `/api/perfil`
 
 `perfilRecurso` é um mapa em que a chave é o UUID do recurso e o valor é a lista de UUIDs das permissões concedidas.
 
-Na criação e atualização, a API carrega recursos e permissões pelo banco antes de associá-los ao perfil. IDs inexistentes, recursos ou permissões inativos e valores duplicados são rejeitados. Uma lista ausente é tratada como vazia; na atualização isso remove as associações que não foram enviadas. A chave do perfil é recalculada sempre que seu nome muda.
+Na criação e atualização, a API carrega recursos e permissões pelo banco antes de associá-los ao perfil. IDs inexistentes, recursos ou permissões inativos e valores duplicados são rejeitados. Uma lista ausente é tratada como vazia; na atualização isso remove as associações que não foram enviadas. A chave do perfil é definida na criação.
 
 ```json
 {
@@ -344,7 +359,7 @@ No `starter-package-app`, configure:
 NEXT_PUBLIC_BASE_URL=http://localhost:8085/api
 ```
 
-O app armazena o JWT como `accessToken` no `localStorage` e o envia como Bearer token. O login converte o campo de formulário `senha` para `password`, como esperado pela API.
+O app mantém o JWT como `accessToken` na sessão do NextAuth e o envia como Bearer token, sem duplicá-lo no `localStorage`. O login converte o campo de formulário `senha` para `password`, como esperado pela API.
 
 ## Regras de arquitetura
 

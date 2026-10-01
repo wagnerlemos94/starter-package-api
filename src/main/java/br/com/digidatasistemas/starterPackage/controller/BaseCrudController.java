@@ -3,9 +3,11 @@ package br.com.digidatasistemas.starterPackage.controller;
 import br.com.digidata.crud.controller.CrudController;
 import br.com.digidata.crud.controller.dto.request.IRequest;
 import br.com.digidata.crud.controller.dto.response.IResponse;
+import br.com.digidata.crud.controller.dto.response.PageResponse;
 import br.com.digidata.crud.service.ICrudService;
 import br.com.digidatasistemas.starterPackage.security.permissao.RecursoPermissao;
 import br.com.digidatasistemas.starterPackage.service.IAutorizacaoService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -19,7 +21,7 @@ public abstract class BaseCrudController<
         Request,
         Response,
         Model>
-        extends CrudController<Request, Response, Model> {
+        extends CrudController<Request, Response, Model, UUID> {
 
     private final IAutorizacaoService autorizacaoService;
 
@@ -52,11 +54,10 @@ public abstract class BaseCrudController<
     }
 
     @Override
-    public List<Response> list() {
+    public PageResponse<Response> list(Pageable pageable) {
 
         checkCrudPermission("VIEW");
-
-        return super.list();
+        return super.list(pageable);
     }
 
     @Override
