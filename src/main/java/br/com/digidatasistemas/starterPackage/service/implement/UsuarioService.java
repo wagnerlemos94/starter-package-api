@@ -1,6 +1,7 @@
 package br.com.digidatasistemas.starterPackage.service.implement;
 
 import br.com.digidata.crud.service.CrudService;
+import br.com.digidatasistemas.starterPackage.controller.dto.response.DashboardResponse;
 import br.com.digidatasistemas.starterPackage.exception.BusinessException;
 import br.com.digidatasistemas.starterPackage.exception.ConflictException;
 import br.com.digidatasistemas.starterPackage.model.Perfil;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -54,18 +54,18 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
     public Usuario create(Usuario usuario) {
         validacaoCriacaoUsuario(usuario);
 
-        String password = passwordEncoder.encode(usuario.getPassword());
+        String senha = passwordEncoder.encode(usuario.getPassword());
         Perfil perfil = perfilService.findById(
                 usuario.getPerfil().getId()
         );
 
         usuario = Usuario.builder()
                 .cpf(usuario.getCpf())
-                .name(usuario.getName())
-                .password(password)
+                .nome(usuario.getNome())
+                .senha(senha)
                 .perfil(perfil)
-                .active(usuario.getActive() != null
-                        ? usuario.getActive()
+                .ativo(usuario.getAtivo() != null
+                        ? usuario.getAtivo()
                         : Boolean.TRUE)
                 .build();
         return usuarioRepository.save(usuario);
@@ -83,12 +83,12 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
         }
 
         usuarioUpdate.setCpf(usuario.getCpf());
-        usuarioUpdate.setName(usuario.getName());
+        usuarioUpdate.setNome(usuario.getNome());
 
         if (usuario.getPassword() != null
                 && !usuario.getPassword().isBlank()) {
 
-            usuarioUpdate.setPassword(
+            usuarioUpdate.setSenha(
                     passwordEncoder.encode(usuario.getPassword())
             );
         }
@@ -97,8 +97,8 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
         );
 
         usuarioUpdate.setPerfil(perfil);
-        if (usuario.getActive() != null) {
-            usuarioUpdate.setActive(usuario.getActive());
+        if (usuario.getAtivo() != null) {
+            usuarioUpdate.setAtivo(usuario.getAtivo());
         }
 
         return usuarioRepository.save(usuarioUpdate);
@@ -111,15 +111,15 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
 
     @Transactional
     @Override
-    public Usuario updateCurrent(UUID id, String name, String password, String currentPassword) {
+    public Usuario updateCurrent(UUID id, String name, String senha, String currentPassword) {
         Usuario usuario = super.findById(id);
-        if (password != null) {
+        if (senha != null) {
             if (currentPassword == null || !passwordEncoder.matches(currentPassword, usuario.getPassword())) {
                 throw new BusinessException(MSG_SENHA_ATUAL_INVALIDA);
             }
-            usuario.setPassword(passwordEncoder.encode(password));
+            usuario.setSenha(passwordEncoder.encode(senha));
         }
-        usuario.setName(name.trim());
+        usuario.setNome(name.trim());
         return inicializarRelacionamentos(usuarioRepository.save(usuario));
     }
 
@@ -143,5 +143,12 @@ public class UsuarioService extends CrudService<Usuario, UUID> implements IUsuar
     private Usuario inicializarRelacionamentos(Usuario usuario) {
         usuario.getAuthorities();
         return usuario;
+    }
+
+    @Override
+    public DashboardResponse getDashboardData() {
+        var dashboardResponse = usuarioRepository.buscarDadosDashboard();
+        dashboardResponse.setNome("Usuários");
+        return dashboardResponse;
     }
 }

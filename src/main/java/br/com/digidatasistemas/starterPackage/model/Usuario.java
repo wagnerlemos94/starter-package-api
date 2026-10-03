@@ -27,21 +27,21 @@ public class Usuario implements UserDetails {
     private UUID id;
 
     @Column(nullable = false)
-    private String name;
+    private String nome;
 
     @Column(nullable = false, unique = true)
     private String cpf;
 
     @JsonIgnore
     @Column(nullable = false)
-    private String password;
+    private String senha;
 
     @Column(nullable = false)
     @Builder.Default
-    private Boolean active = Boolean.TRUE;
+    private Boolean ativo = Boolean.TRUE;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "profile_id")
+    @JoinColumn(name = "perfil_id")
     private Perfil perfil;
 
     @Override
@@ -96,6 +96,12 @@ public class Usuario implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
+    public String getPassword() {
+        return senha;
+    }
+
+    @Override
     public String getUsername() {
         return cpf;
     }
@@ -117,7 +123,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return Boolean.TRUE.equals(active)
+        return Boolean.TRUE.equals(ativo)
                 && perfil != null
                 && Boolean.TRUE.equals(perfil.getAtivo());
     }

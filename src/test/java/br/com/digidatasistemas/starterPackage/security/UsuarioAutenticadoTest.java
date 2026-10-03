@@ -29,8 +29,8 @@ class UsuarioAutenticadoTest {
         Usuario usuario = Usuario.builder()
                 .id(id)
                 .cpf("00000000000")
-                .name("Usuario Teste")
-                .active(true)
+                .nome("Usuario Teste")
+                .ativo(true)
                 .build();
 
         SecurityContextHolder.getContext().setAuthentication(

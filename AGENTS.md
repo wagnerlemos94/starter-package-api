@@ -15,7 +15,7 @@
 - A listagem é `list(Pageable)` no controller e `findAll(Pageable)` no service. Preserve a checagem `VIEW` antes da consulta.
 - `PageResponse` contém `content`, `page`, `size`, `totalElements` e `totalPages`; a biblioteca limita o tamanho da página a 100.
 - Relacionamentos são `LAZY`, com Open Session in View desativado. Inicialize dentro da transação somente os relacionamentos necessários à operação e aos DTOs.
-- A resposta de usuário contém `profile` como nome do perfil e `profileId` como UUID. Não substitua esses campos por um objeto de perfil completo.
+- A resposta de usuário contém `perfil` como nome do perfil e `perfilId` como UUID. Não substitua esses campos por um objeto de perfil completo.
 - A chave do perfil é gerada na criação e preservada quando seu nome é atualizado. Recursos e permissões também restringem os campos atualizáveis por `updatableProperties()`.
 - Na associação de recursos e permissões a perfis, carregue as entidades pelo banco e preserve as validações de existência, atividade e duplicidade.
 - Vincule ao perfil somente recursos com pelo menos uma permissão. Na atualização, uma lista vazia ou nula de permissões remove o vínculo existente com aquele recurso.

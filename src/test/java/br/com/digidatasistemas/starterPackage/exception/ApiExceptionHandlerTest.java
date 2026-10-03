@@ -43,7 +43,7 @@ class ApiExceptionHandlerTest {
         Object target = new Object();
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(target, "usuarioRequest");
         bindingResult.addError(new FieldError("usuarioRequest", "cpf", "CPF inválido"));
-        bindingResult.addError(new FieldError("usuarioRequest", "name", "Nome é obrigatório"));
+        bindingResult.addError(new FieldError("usuarioRequest", "nome", "Nome é obrigatório"));
         MethodArgumentNotValidException exception = new MethodArgumentNotValidException(null, bindingResult);
 
         ResponseEntity<ErrorResponse> response = handler.handleValidation(exception, request);

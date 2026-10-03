@@ -104,9 +104,9 @@ class JwtAuthenticationFilterTest {
     private Usuario usuario(boolean active) {
         return Usuario.builder()
                 .cpf("00000000535")
-                .name("Usuário Teste")
-                .password("hash")
-                .active(active)
+                .nome("Usuário Teste")
+                .senha("hash")
+                .ativo(active)
                 .build();
     }
 }

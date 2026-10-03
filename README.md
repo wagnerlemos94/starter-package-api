@@ -207,10 +207,10 @@ Payload de criação e atualização:
 ```json
 {
   "cpf": "00000000000",
-  "name": "Maria da Silva",
-  "profileId": "a747e317-12b2-4e97-82ac-d583ea704141",
-  "password": "senha-segura",
-  "active": true
+  "nome": "Maria da Silva",
+  "perfilId": "a747e317-12b2-4e97-82ac-d583ea704141",
+  "senha": "senha-segura",
+  "ativo": true
 }
 ```
 
@@ -220,14 +220,22 @@ Resposta:
 {
   "id": "9c95cb22-cc70-48ef-ad47-9fd68d635ad8",
   "cpf": "00000000000",
-  "name": "Maria da Silva",
-  "active": true,
-  "profile": "ADMIN",
-  "profileId": "a747e317-12b2-4e97-82ac-d583ea704141"
+  "nome": "Maria da Silva",
+  "ativo": true,
+  "perfil": "ADMIN",
+  "perfilId": "a747e317-12b2-4e97-82ac-d583ea704141"
 }
 ```
 
-Na criação, `password` é obrigatório e deve possuir entre 8 e 72 caracteres. Na atualização, o campo pode ser omitido para manter a senha atual. A API armazena apenas o hash BCrypt e nunca devolve a senha na resposta.
+Na criação, `senha` é obrigatório e deve possuir entre 8 e 72 caracteres. Na atualização, o campo pode ser omitido para manter a senha atual. A API armazena apenas o hash BCrypt e nunca devolve a senha na resposta.
+
+A migration `V7__renomear_colunas_usuario.sql` renomeia `name`, `password`, `active` e `profile_id` para `nome`, `senha`, `ativo` e `perfil_id`, preservando os dados existentes. Execute com Flyway habilitado antes de usar esta versão da API e atualize o frontend junto com o backend. O endpoint `/auth/login` continua recebendo `password`.
+
+## Dashboard
+
+`GET /api/dashboard` exige JWT válido e a permissão `DASHBOARD:VIEW`. Retorna uma lista de resumos de usuários e perfis com `nome`, `descricao`, `total`, `ativos` e `inativos`. As contagens representam o status dos cadastros, não logins recentes. Quando não há registros, os totais são zero.
+
+A migration V8 cadastra o recurso `DASHBOARD`. Vincule a permissão `VIEW` desse recurso aos perfis autorizados pela administração de perfis; depois faça login novamente para atualizar as permissões da sessão do frontend. A migration não concede permissões automaticamente.
 
 ## Edição da própria conta
 
@@ -235,13 +243,13 @@ Na criação, `password` é obrigatório e deve possuir entre 8 e 72 caracteres.
 
 ```json
 {
-  "name": "Maria da Silva",
-  "password": "nova-senha-segura",
-  "currentPassword": "senha-atual"
+  "nome": "Maria da Silva",
+  "senha": "nova-senha-segura",
+  "senhaAtual": "senha-atual"
 }
 ```
 
-Para atualizar somente o nome, omita `password` e `currentPassword`. Para trocar a senha, informe uma nova senha entre 8 e 72 caracteres e a senha atual correta; senha atual inválida retorna `400`. A resposta usa o mesmo DTO de usuário, sem senhas.
+Para atualizar somente o nome, omita `senha` e `senhaAtual`. Para trocar a senha, informe uma nova senha entre 8 e 72 caracteres e a senha atual correta; senha atual inválida retorna `400`. A resposta usa o mesmo DTO de usuário, sem senhas.
 
 CPF, perfil e status não são alteráveis por esses endpoints. A edição administrativa por UUID continua sujeita às permissões CRUD existentes.
 

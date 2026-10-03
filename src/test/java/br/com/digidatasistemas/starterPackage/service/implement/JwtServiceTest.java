@@ -82,9 +82,9 @@ class JwtServiceTest {
 
         return Usuario.builder()
                 .cpf("00000000535")
-                .name("Usuário Teste")
-                .password("hash")
-                .active(active)
+                .nome("Usuário Teste")
+                .senha("hash")
+                .ativo(active)
                 .perfil(perfil)
                 .build();
     }

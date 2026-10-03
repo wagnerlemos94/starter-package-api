@@ -44,8 +44,8 @@ public class UsuarioController extends BaseCrudController<UsuarioRequest, Usuari
 
     @PutMapping("/me")
     public UsuarioResponse updateCurrent(@Valid @RequestBody UsuarioContaRequest request) {
-        return response.to(service.updateCurrent(usuarioAutenticado.getId(), request.name(),
-                request.password(), request.currentPassword()));
+        return response.to(service.updateCurrent(usuarioAutenticado.getId(), request.nome(),
+                request.senha(), request.senhaAtual()));
     }
 
 }

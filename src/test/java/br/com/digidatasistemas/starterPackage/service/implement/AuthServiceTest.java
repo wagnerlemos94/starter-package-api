@@ -93,9 +93,9 @@ class AuthServiceTest {
 
         return Usuario.builder()
                 .cpf("00000000535")
-                .name("Usuário Teste")
-                .password("hash")
-                .active(true)
+                .nome("Usuário Teste")
+                .senha("hash")
+                .ativo(true)
                 .perfil(perfil)
                 .build();
     }

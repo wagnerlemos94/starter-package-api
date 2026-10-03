@@ -64,9 +64,9 @@ class UsuarioAuthoritiesTest {
     private Usuario usuario(Perfil perfil) {
         return Usuario.builder()
                 .cpf("00000000535")
-                .password("hash")
-                .name("Usuário")
-                .active(true)
+                .senha("hash")
+                .nome("Usuário")
+                .ativo(true)
                 .perfil(perfil)
                 .build();
     }

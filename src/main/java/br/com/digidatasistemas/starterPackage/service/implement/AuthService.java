@@ -69,7 +69,7 @@ public class AuthService implements IAuthService {
         return new LoginResponse(
                 token,
                 jwtService.getExpirationMillis(),
-                usuario.getName(),
+                usuario.getNome(),
                 usuario.getCpf(),
                 resources
         );

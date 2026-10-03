@@ -68,10 +68,10 @@ class DtoMappingTest {
         var usuarioRequest = new UsuarioRequest();
         usuarioRequest.setId(id);
         usuarioRequest.setCpf("00000000535");
-        usuarioRequest.setName("Usuário");
-        usuarioRequest.setProfileId(perfilId);
-        usuarioRequest.setPassword("senha-segura");
-        usuarioRequest.setActive(true);
+        usuarioRequest.setNome("Usuário");
+        usuarioRequest.setPerfilId(perfilId);
+        usuarioRequest.setSenha("senha-segura");
+        usuarioRequest.setAtivo(true);
 
         Usuario usuario = usuarioRequest.to(usuarioRequest);
         assertThat(usuario.getId()).isEqualTo(id);
@@ -111,8 +111,8 @@ class DtoMappingTest {
         var associacao = PerfilRecurso.builder().id(UUID.randomUUID()).recurso(recurso).permissoes(List.of(permissao)).build();
         var perfil = Perfil.builder().id(UUID.randomUUID()).nome("Operador").chave("OPERADOR")
                 .perfilRecursos(List.of(associacao)).ativo(true).build();
-        var usuario = Usuario.builder().id(UUID.randomUUID()).cpf("00000000535").name("Usuário")
-                .active(true).perfil(perfil).build();
+        var usuario = Usuario.builder().id(UUID.randomUUID()).cpf("00000000535").nome("Usuário")
+                .ativo(true).perfil(perfil).build();
 
         PerfilResponse perfilResponse = new PerfilResponse().to(perfil);
         assertThat(perfilResponse.getPerfilRecursoResponse()).singleElement().satisfies(item -> {
@@ -127,10 +127,10 @@ class DtoMappingTest {
         assertThat(new UsuarioResponse().to(List.of(usuario))).singleElement().satisfies(response -> {
             assertThat(response.getId()).isEqualTo(usuario.getId());
             assertThat(response.getCpf()).isEqualTo("00000000535");
-            assertThat(response.getName()).isEqualTo("Usuário");
-            assertThat(response.getActive()).isTrue();
-            assertThat(response.getProfile()).isEqualTo("Operador");
-            assertThat(response.getProfileId()).isEqualTo(perfil.getId());
+            assertThat(response.getNome()).isEqualTo("Usuário");
+            assertThat(response.getAtivo()).isTrue();
+            assertThat(response.getPerfil()).isEqualTo("Operador");
+            assertThat(response.getPerfilId()).isEqualTo(perfil.getId());
         });
     }
 

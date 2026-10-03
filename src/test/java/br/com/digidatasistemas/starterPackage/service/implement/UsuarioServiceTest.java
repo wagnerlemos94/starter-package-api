@@ -88,11 +88,11 @@ class UsuarioServiceTest {
 
         Usuario resultado = usuarioService.updateCurrent(id, "  Novo nome  ", null, null);
 
-        assertEquals("Novo nome", resultado.getName());
+        assertEquals("Novo nome", resultado.getNome());
         assertEquals(CPF, resultado.getCpf());
         assertEquals("hash-atual", resultado.getPassword());
         assertSame(perfilOriginal, resultado.getPerfil());
-        assertTrue(resultado.getActive());
+        assertTrue(resultado.getAtivo());
         verify(passwordEncoder, never()).encode(any());
     }
 
@@ -108,7 +108,7 @@ class UsuarioServiceTest {
         Usuario resultado = usuarioService.updateCurrent(id, "Novo nome", SENHA, "senha-atual");
 
         assertEquals(SENHA_CRIPTOGRAFADA, resultado.getPassword());
-        assertEquals("Novo nome", resultado.getName());
+        assertEquals("Novo nome", resultado.getNome());
     }
 
     @Test
@@ -121,7 +121,7 @@ class UsuarioServiceTest {
         assertThrows(BusinessException.class,
                 () -> usuarioService.updateCurrent(id, "Novo nome", SENHA, "incorreta"));
 
-        assertEquals("Nome anterior", existente.getName());
+        assertEquals("Nome anterior", existente.getNome());
         assertEquals("hash-atual", existente.getPassword());
         verify(usuarioRepository, never()).save(any());
         verify(passwordEncoder, never()).encode(any());
@@ -151,7 +151,7 @@ class UsuarioServiceTest {
         Usuario resultado = usuarioService.create(usuario);
 
         assertEquals(CPF, resultado.getCpf());
-        assertEquals("Usuário Teste", resultado.getName());
+        assertEquals("Usuário Teste", resultado.getNome());
         assertEquals(SENHA_CRIPTOGRAFADA, resultado.getPassword());
         assertSame(perfilCarregado, resultado.getPerfil());
         verify(passwordEncoder).encode(SENHA);
@@ -162,7 +162,7 @@ class UsuarioServiceTest {
     void deveAtivarUsuarioPorPadraoNaCriacao() {
         Perfil perfil = perfil(UUID.randomUUID());
         Usuario usuario = usuarioNovo(perfil);
-        usuario.setActive(null);
+        usuario.setAtivo(null);
 
         when(usuarioRepository.existsByCpf(CPF)).thenReturn(false);
         when(passwordEncoder.encode(SENHA)).thenReturn(SENHA_CRIPTOGRAFADA);
@@ -171,7 +171,7 @@ class UsuarioServiceTest {
 
         Usuario resultado = usuarioService.create(usuario);
 
-        assertTrue(resultado.getActive());
+        assertTrue(resultado.getAtivo());
     }
 
     @Test
@@ -188,7 +188,7 @@ class UsuarioServiceTest {
     @Test
     void deveRejeitarCriacaoSemSenha() {
         Usuario usuario = usuarioNovo(perfil(UUID.randomUUID()));
-        usuario.setPassword(" ");
+        usuario.setSenha(" ");
         when(usuarioRepository.existsByCpf(CPF)).thenReturn(false);
 
         assertThrows(BusinessException.class, () -> usuarioService.create(usuario));
@@ -203,8 +203,8 @@ class UsuarioServiceTest {
         Perfil perfilAtualizado = perfil(UUID.randomUUID());
         Usuario existente = usuarioExistente(id, "hash-atual", true);
         Usuario alteracoes = usuarioNovo(perfilAtualizado);
-        alteracoes.setPassword(null);
-        alteracoes.setActive(null);
+        alteracoes.setSenha(null);
+        alteracoes.setAtivo(null);
 
         when(usuarioRepository.findById(id)).thenReturn(Optional.of(existente));
         when(usuarioRepository.existsByCpfAndIdNot(CPF, id)).thenReturn(false);
@@ -214,7 +214,7 @@ class UsuarioServiceTest {
         Usuario resultado = usuarioService.update(id, alteracoes);
 
         assertEquals("hash-atual", resultado.getPassword());
-        assertTrue(resultado.getActive());
+        assertTrue(resultado.getAtivo());
         assertSame(perfilAtualizado, resultado.getPerfil());
         verify(passwordEncoder, never()).encode(any());
     }
@@ -225,7 +225,7 @@ class UsuarioServiceTest {
         Perfil perfilAtualizado = perfil(UUID.randomUUID());
         Usuario existente = usuarioExistente(id, "hash-atual", true);
         Usuario alteracoes = usuarioNovo(perfilAtualizado);
-        alteracoes.setActive(false);
+        alteracoes.setAtivo(false);
 
         when(usuarioRepository.findById(id)).thenReturn(Optional.of(existente));
         when(usuarioRepository.existsByCpfAndIdNot(CPF, id)).thenReturn(false);
@@ -236,7 +236,7 @@ class UsuarioServiceTest {
         Usuario resultado = usuarioService.update(id, alteracoes);
 
         assertEquals(SENHA_CRIPTOGRAFADA, resultado.getPassword());
-        assertFalse(resultado.getActive());
+        assertFalse(resultado.getAtivo());
         verify(passwordEncoder).encode(SENHA);
     }
 
@@ -277,10 +277,10 @@ class UsuarioServiceTest {
     private Usuario usuarioNovo(Perfil perfil) {
         return Usuario.builder()
                 .cpf(CPF)
-                .name("Usuário Teste")
-                .password(SENHA)
+                .nome("Usuário Teste")
+                .senha(SENHA)
                 .perfil(perfil)
-                .active(true)
+                .ativo(true)
                 .build();
     }
 
@@ -288,10 +288,10 @@ class UsuarioServiceTest {
         return Usuario.builder()
                 .id(id)
                 .cpf(CPF)
-                .name("Nome anterior")
-                .password(senha)
+                .nome("Nome anterior")
+                .senha(senha)
                 .perfil(perfil(UUID.randomUUID()))
-                .active(active)
+                .ativo(active)
                 .build();
     }
 

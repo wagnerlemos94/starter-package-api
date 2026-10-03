@@ -30,24 +30,24 @@ public class UsuarioRequest implements IRequest<UsuarioRequest, Usuario> {
     private String cpf;
     @NotBlank(message = MSG_NOME_OBRIGATORIO)
     @Size(max = 150, message = MSG_NOME_MAXIMO_150)
-    private String name;
+    private String nome;
     @NotNull(message = MSG_PERFIL_OBRIGATORIO)
-    private UUID profileId;
+    private UUID perfilId;
     @Size(min = 8, max = 72, message = MSG_SENHA_TAMANHO_INVALIDO)
-    private String password;
-    private Boolean active;
+    private String senha;
+    private Boolean ativo;
 
     @Override
     public Usuario to(UsuarioRequest usuarioRequest) {
         Perfil perfil = new Perfil();
-        perfil.setId(usuarioRequest.getProfileId());
+        perfil.setId(usuarioRequest.getPerfilId());
         return Usuario.builder()
                 .id(usuarioRequest.getId())
                 .cpf(usuarioRequest.getCpf())
-                .name(usuarioRequest.getName())
-                .active(usuarioRequest.getActive())
+                .nome(usuarioRequest.getNome())
+                .ativo(usuarioRequest.getAtivo())
                 .perfil(perfil)
-                .password(usuarioRequest.getPassword())
+                .senha(usuarioRequest.getSenha())
                 .build();
     }
 

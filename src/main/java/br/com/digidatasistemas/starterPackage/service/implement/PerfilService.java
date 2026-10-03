@@ -1,12 +1,10 @@
 package br.com.digidatasistemas.starterPackage.service.implement;
 
 import br.com.digidata.crud.service.CrudService;
+import br.com.digidatasistemas.starterPackage.controller.dto.response.DashboardResponse;
 import br.com.digidatasistemas.starterPackage.exception.BusinessException;
 import br.com.digidatasistemas.starterPackage.exception.ConflictException;
-import br.com.digidatasistemas.starterPackage.model.Perfil;
-import br.com.digidatasistemas.starterPackage.model.PerfilRecurso;
-import br.com.digidatasistemas.starterPackage.model.Permissao;
-import br.com.digidatasistemas.starterPackage.model.Recurso;
+import br.com.digidatasistemas.starterPackage.model.*;
 import br.com.digidatasistemas.starterPackage.repository.PerfilRepository;
 import br.com.digidatasistemas.starterPackage.service.IPerfilService;
 import br.com.digidatasistemas.starterPackage.service.IPermissaoService;
@@ -236,6 +234,13 @@ public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilS
             associacao.getPermissoes().size();
         });
         return perfil;
+    }
+
+    @Override
+    public DashboardResponse getDashboardData() {
+        var dashboardResponse = repository.buscarDadosDashboard();
+        dashboardResponse.setNome("Perfil");
+        return dashboardResponse;
     }
 
     private record AssociacaoCarregada(Recurso recurso, List<Permissao> permissoes) {

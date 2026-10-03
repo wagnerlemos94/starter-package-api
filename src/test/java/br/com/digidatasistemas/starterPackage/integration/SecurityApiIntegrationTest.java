@@ -56,6 +56,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = {
         AuthController.class,
+        br.com.digidatasistemas.starterPackage.controller.DashboardController.class,
         UsuarioController.class,
         SecurityTestController.class
 }, properties = "spring.profiles.default=test")
@@ -90,6 +91,36 @@ class SecurityApiIntegrationTest {
     @MockitoBean
     private IAutorizacaoService autorizacaoService;
 
+    @MockitoBean
+    private br.com.digidatasistemas.starterPackage.service.IDashboardService dashboardService;
+
+    @Test
+    void dashboardDeveExigirTokenEPermissao() throws Exception {
+        mockMvc.perform(get("/dashboard")).andExpect(status().isUnauthorized());
+        configurarTokenValido(usuarioSemPermissao());
+        mockMvc.perform(get("/dashboard").header("Authorization", "Bearer valido"))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(dashboardService);
+    }
+
+    @Test
+    void dashboardDeveRetornarIndicadoresComPermissao() throws Exception {
+        var permissao = Permissao.builder().chave("VIEW").ativo(true).build();
+        var recurso = Recurso.builder().chave("DASHBOARD").ativo(true).build();
+        var vinculo = PerfilRecurso.builder().recurso(recurso).permissoes(List.of(permissao)).build();
+        var perfil = Perfil.builder().chave("GESTOR").ativo(true).perfilRecursos(List.of(vinculo)).build();
+        configurarTokenValido(usuarioComPerfil(perfil));
+        var resumo = new br.com.digidatasistemas.starterPackage.controller.dto.response.DashboardResponse(3L, 2L, 1L);
+        resumo.setNome("Usuários");
+        when(dashboardService.listar()).thenReturn(List.of(resumo));
+        mockMvc.perform(get("/dashboard").header("Authorization", "Bearer valido"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nome").value("Usuários"))
+                .andExpect(jsonPath("$[0].total").value(3))
+                .andExpect(jsonPath("$[0].ativos").value(2))
+                .andExpect(jsonPath("$[0].inativos").value(1));
+    }
+
     @AfterEach
     void limparContexto() {
         SecurityContextHolder.clearContext();
@@ -99,7 +130,7 @@ class SecurityApiIntegrationTest {
     void propriaContaSemTokenDeveRetornar401() throws Exception {
         mockMvc.perform(get("/usuario/me")).andExpect(status().isUnauthorized());
         mockMvc.perform(put("/usuario/me").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Novo nome\"}"))
+                        .content("{\"nome\":\"Novo nome\"}"))
                 .andExpect(status().isUnauthorized());
         verifyNoInteractions(usuarioService);
     }
@@ -114,8 +145,13 @@ class SecurityApiIntegrationTest {
         mockMvc.perform(get("/usuario/me").header("Authorization", "Bearer valido"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(usuario.getId().toString()))
-                .andExpect(jsonPath("$.profile").value("Básico"))
-                .andExpect(jsonPath("$.password").doesNotExist());
+                .andExpect(jsonPath("$.perfil").value("Básico"))
+                .andExpect(jsonPath("$.senha").doesNotExist())
+                .andExpect(jsonPath("$.password").doesNotExist())
+                .andExpect(jsonPath("$.name").doesNotExist())
+                .andExpect(jsonPath("$.profileId").doesNotExist())
+                .andExpect(jsonPath("$.nome").value(usuario.getNome()))
+                .andExpect(jsonPath("$.perfilId").value(usuario.getPerfil().getId().toString()));
         verifyNoInteractions(autorizacaoService);
     }
 
@@ -130,13 +166,13 @@ class SecurityApiIntegrationTest {
         mockMvc.perform(put("/usuario/me").header("Authorization", "Bearer valido")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name":"Novo nome","id":"00000000-0000-0000-0000-000000000001",
-                                 "cpf":"11111111111","profileId":"00000000-0000-0000-0000-000000000002","active":false}
+                                {"nome":"Novo nome","id":"00000000-0000-0000-0000-000000000001",
+                                 "cpf":"11111111111","perfilId":"00000000-0000-0000-0000-000000000002","ativo":false}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(usuario.getId().toString()))
                 .andExpect(jsonPath("$.cpf").value(usuario.getCpf()))
-                .andExpect(jsonPath("$.active").value(true));
+                .andExpect(jsonPath("$.ativo").value(true));
         verify(usuarioService).updateCurrent(usuario.getId(), "Novo nome", null, null);
         verifyNoInteractions(autorizacaoService);
     }
@@ -146,15 +182,15 @@ class SecurityApiIntegrationTest {
         configurarTokenValido(usuarioSemPermissao());
         mockMvc.perform(put("/usuario/me").header("Authorization", "Bearer valido")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"  \",\"password\":\"curta\"}"))
+                        .content("{\"nome\":\"  \",\"senha\":\"curta\"}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[?(@.field == 'name')]").exists())
-                .andExpect(jsonPath("$.errors[?(@.field == 'password')]").exists());
+                .andExpect(jsonPath("$.errors[?(@.field == 'nome')]").exists())
+                .andExpect(jsonPath("$.errors[?(@.field == 'senha')]").exists());
         mockMvc.perform(put("/usuario/me").header("Authorization", "Bearer valido")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Novo nome\",\"password\":\"        \"}"))
+                        .content("{\"nome\":\"Novo nome\",\"senha\":\"        \"}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[?(@.field == 'password')]").exists());
+                .andExpect(jsonPath("$.errors[?(@.field == 'senha')]").exists());
         verifyNoInteractions(usuarioService);
     }
 
@@ -165,8 +201,8 @@ class SecurityApiIntegrationTest {
         mockMvc.perform(put("/usuario/" + UUID.randomUUID()).header("Authorization", "Bearer valido")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name":"Outro usuário","cpf":"00000000535",
-                                 "profileId":"00000000-0000-0000-0000-000000000001","active":true}
+                                {"nome":"Outro usuário","cpf":"00000000535",
+                                 "perfilId":"00000000-0000-0000-0000-000000000001","ativo":true}
                                 """))
                 .andExpect(status().isForbidden());
         verifyNoInteractions(usuarioService);
@@ -299,6 +335,7 @@ class SecurityApiIntegrationTest {
 
     private Usuario usuarioSemPermissao() {
         return usuarioComPerfil(Perfil.builder()
+                .id(UUID.randomUUID())
                 .nome("Básico")
                 .chave("BASICO")
                 .ativo(true)
@@ -325,9 +362,9 @@ class SecurityApiIntegrationTest {
     private Usuario usuarioComPerfil(Perfil perfil) {
         return Usuario.builder()
                 .cpf("00000000535")
-                .name("Usuário Teste")
-                .password("hash")
-                .active(true)
+                .nome("Usuário Teste")
+                .senha("hash")
+                .ativo(true)
                 .perfil(perfil)
                 .build();
     }
