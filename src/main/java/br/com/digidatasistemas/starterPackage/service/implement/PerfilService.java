@@ -180,7 +180,9 @@ public class PerfilService extends CrudService<Perfil, UUID> implements IPerfilS
             }
 
             List<Permissao> permissoes = carregarPermissoes(associacao.getPermissoes());
-            resultado.put(recursoId, new AssociacaoCarregada(recurso, permissoes));
+            if (!permissoes.isEmpty()) {
+                resultado.put(recursoId, new AssociacaoCarregada(recurso, permissoes));
+            }
         }
 
         return resultado;

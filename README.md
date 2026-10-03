@@ -251,6 +251,8 @@ Base: `/api/perfil`
 
 `perfilRecurso` é um mapa em que a chave é o UUID do recurso e o valor é a lista de UUIDs das permissões concedidas.
 
+Somente recursos com pelo menos uma permissão são vinculados ao perfil. Uma lista vazia ou nula de permissões não cria o vínculo; na atualização, remove um vínculo existente com aquele recurso. Vínculos vazios já gravados são removidos quando o perfil é salvo novamente.
+
 Na criação e atualização, a API carrega recursos e permissões pelo banco antes de associá-los ao perfil. IDs inexistentes, recursos ou permissões inativos e valores duplicados são rejeitados. Uma lista ausente é tratada como vazia; na atualização isso remove as associações que não foram enviadas. A chave do perfil é definida na criação.
 
 ```json

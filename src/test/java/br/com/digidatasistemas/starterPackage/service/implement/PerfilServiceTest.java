@@ -118,6 +118,53 @@ class PerfilServiceTest {
     }
 
     @Test
+    void deveCriarPerfilSomenteComRecursosQuePossuemPermissoes() {
+        UUID recursoVazioId = UUID.randomUUID();
+        UUID recursoNuloId = UUID.randomUUID();
+        UUID recursoPermitidoId = UUID.randomUUID();
+        UUID permissaoId = UUID.randomUUID();
+        PerfilRecurso semPermissoes = associacao(recursoNuloId, List.of());
+        semPermissoes.setPermissoes(null);
+        Perfil perfil = Perfil.builder().nome("Gestor").perfilRecursos(List.of(
+                associacao(recursoVazioId, List.of()), semPermissoes,
+                associacao(recursoPermitidoId, List.of(permissaoId)))).build();
+        when(recursoService.findById(recursoVazioId)).thenReturn(recurso(recursoVazioId, true));
+        when(recursoService.findById(recursoNuloId)).thenReturn(recurso(recursoNuloId, true));
+        when(recursoService.findById(recursoPermitidoId)).thenReturn(recurso(recursoPermitidoId, true));
+        when(permissaoService.findById(permissaoId)).thenReturn(permissao(permissaoId, true));
+        when(repository.save(any(Perfil.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Perfil resultado = perfilService.create(perfil);
+
+        assertEquals(1, resultado.getPerfilRecursos().size());
+        assertEquals(recursoPermitidoId, resultado.getPerfilRecursos().get(0).getRecurso().getId());
+    }
+
+    @Test
+    void deveRemoverVinculoAoRetirarTodasAsPermissoesSemAlterarOutrosRecursos() {
+        UUID perfilId = UUID.randomUUID();
+        UUID recursoRemovidoId = UUID.randomUUID();
+        UUID recursoMantidoId = UUID.randomUUID();
+        UUID permissaoId = UUID.randomUUID();
+        PerfilRecurso mantido = associacao(recursoMantidoId, List.of(permissaoId));
+        Perfil existente = Perfil.builder().id(perfilId).nome("Gestor").perfilRecursos(
+                new ArrayList<>(List.of(associacao(recursoRemovidoId, List.of(permissaoId)), mantido))).build();
+        Perfil alteracoes = Perfil.builder().nome("Gestor").perfilRecursos(List.of(
+                associacao(recursoRemovidoId, List.of()),
+                associacao(recursoMantidoId, List.of(permissaoId)))).build();
+        when(repository.findById(perfilId)).thenReturn(Optional.of(existente));
+        when(recursoService.findById(recursoRemovidoId)).thenReturn(recurso(recursoRemovidoId, true));
+        when(recursoService.findById(recursoMantidoId)).thenReturn(recurso(recursoMantidoId, true));
+        when(permissaoService.findById(permissaoId)).thenReturn(permissao(permissaoId, true));
+        when(repository.save(existente)).thenReturn(existente);
+
+        Perfil resultado = perfilService.update(perfilId, alteracoes);
+
+        assertEquals(List.of(mantido), resultado.getPerfilRecursos());
+        assertEquals(permissaoId, mantido.getPermissoes().get(0).getId());
+    }
+
+    @Test
     void deveRejeitarNomeDuplicadoNaCriacaoEAtualizacao() {
         Perfil perfil = Perfil.builder().nome("Gestor").build();
         when(repository.existsByNomeIgnoreCase("Gestor")).thenReturn(true);
